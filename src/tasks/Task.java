@@ -5,8 +5,8 @@ import java.util.Objects;
 public class Task {
     String name;
     String description;
-    Integer id;
     Status status;
+    Integer id;
 
     public Task(String name, String description, Status status) {
         this.name = name;
@@ -68,5 +68,15 @@ public class Task {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                ", id=" + id +
+                '}';
     }
 }

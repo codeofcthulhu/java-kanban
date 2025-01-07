@@ -118,33 +118,38 @@ public class TaskManager {
         return epics.get(id);
     }
     public Epic updateEpic (Epic epic) {
-        if (epic.getSubTasksIds().isEmpty()) {
-            epic.setStatus(Status.NEW);
+        if (epics.containsKey(epic.getId())) {
+            Epic existingEpic = epics.get(epic.getId());
+            existingEpic.setName(epic.getName());
+            existingEpic.setDescription(epic.getDescription());
+            if (epic.getSubTasksIds().isEmpty()) {
+                epic.setStatus(Status.NEW);
+                return epic;
+            }
+            boolean hasNew = false;
+            boolean hasDone = false;
+            for (Integer idOfSubTusk : epic.getSubTasksIds()) {
+                Status statusOfSubTusk = subTasks.get(idOfSubTusk).getStatus();
+                if (statusOfSubTusk == Status.NEW) {
+                    hasNew = true;
+                } else if (statusOfSubTusk == Status.DONE) {
+                    hasDone = true;
+                } else {
+                    epic.setStatus(Status.IN_PROGRESS);
+                    return epic;
+                }
+                if (hasNew && hasDone) {
+                    epic.setStatus(Status.IN_PROGRESS);
+                    return epic;
+                }
+            }
+            if (hasNew) {
+                epic.setStatus(Status.NEW);
+            } else if (hasDone) {
+                epic.setStatus(Status.DONE);
+            }
             return epic;
-        }
-        boolean hasNew = false;
-        boolean hasDone = false;
-        for (Integer idOfSubTusk : epic.getSubTasksIds()) {
-            Status statusOfSubTusk = subTasks.get(idOfSubTusk).getStatus();
-            if (statusOfSubTusk == Status.NEW) {
-                hasNew = true;
-            } else if (statusOfSubTusk == Status.DONE) {
-                hasDone = true;
-            } else {
-                epic.setStatus(Status.IN_PROGRESS);
-                return epic;
-            }
-            if (hasNew && hasDone) {
-                epic.setStatus(Status.IN_PROGRESS);
-                return epic;
-            }
-        }
-        if (hasNew) {
-            epic.setStatus(Status.NEW);
-        } else if (hasDone) {
-            epic.setStatus(Status.DONE);
-        }
-        return epic;
+        } else return null;
     }
 
     public Epic deleteEpicById(Integer id) {
