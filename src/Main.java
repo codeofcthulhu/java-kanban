@@ -1,10 +1,11 @@
+import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import tasks.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         System.out.println("Создаём три задачи:");
         Task task0 = new Task("Homework", "do homework", Status.NEW);
@@ -46,7 +47,7 @@ public class Main {
         taskManager.createSubTask(subTask2);
 
         System.out.println("Эпик с id = 3: " + taskManager.getEpicById(3));
-        System.out.println("Все сабтаски этого эпика: \n" + taskManager.getAllSubTasksOfOneEpic(epic0));
+        System.out.println("Все сабтаски этого эпика: \n" + taskManager.getAllSubTasksOfOneEpic(epic0.getId()));
 
         System.out.println("Статус эпика с \"новыми\" сабтасками: \n" + epic0.getStatus());
         subTask2.setStatus(Status.IN_PROGRESS);
@@ -65,7 +66,7 @@ public class Main {
         taskManager.createSubTask(subTask13);
 
         System.out.println(epic1);
-        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic1));
+        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic1.getId()));
 
         System.out.println("Выполняем все сабтаски второго эпика: ");
         subTask10.setStatus(Status.DONE);
@@ -76,7 +77,7 @@ public class Main {
         taskManager.updateSubTask(subTask11);
         taskManager.updateSubTask(subTask12);
         taskManager.updateSubTask(subTask13);
-        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic1));
+        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic1.getId()));
         System.out.println("Статус эпика: " + epic1.getStatus());
 
         System.out.println("Выводим все эпики: ");
@@ -92,7 +93,7 @@ public class Main {
 
         System.out.println("Удаляем второй сабтаск первого эпика");
         System.out.println(taskManager.deleteSubTaskById(5));
-        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic0));
+        System.out.println(taskManager.getAllSubTasksOfOneEpic(epic0.getId()));
 
         System.out.println("Удаляем все сабтаски");
         taskManager.deleteAllSubTasks();
