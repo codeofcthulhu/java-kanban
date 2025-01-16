@@ -11,13 +11,14 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Task> tasks;
     private HashMap<Integer, Epic> epics;
     private HashMap<Integer, SubTask> subTasks;
+    private HistoryManager historyManager;
     private int idCounter = 0;
 
-    public InMemoryTaskManager() {
+    public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
-
+        this.historyManager = historyManager;
     }
 
     private int generateNewId() {
@@ -55,7 +56,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task getTaskById(Integer id) {
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        Task historyTask = new Task(task.getName(), task.getDescription(), task.getStatus());
+        historyTask.setId(id);
+        historyManager.add(historyTask);
+        return task;
     }
 
     @Override
@@ -104,7 +109,11 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public SubTask getSubTaskById(Integer id) {
-        return subTasks.get(id);
+        SubTask subTask = subTasks.get(id);
+        Task historyTask = new SubTask(subTask.getName(), subTask.getDescription(), subTask.getStatus(), subTask.getEpicId());
+        historyTask.setId(id);
+        historyManager.add(historyTask);
+        return subTask;
     }
 
     @Override
@@ -149,7 +158,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Epic getEpicById(Integer id) {
-        return epics.get(id);
+        Epic epic = epics.get(id);
+        Epic historyTask = new Epic(epic.getName(), epic.getDescription());
+        historyTask.setId(id);
+        historyTask.setSubTasksIds(epic.getSubTasksIds());
+        historyManager.add(historyTask);
+        return epic;
     }
 
     @Override
@@ -195,5 +209,9 @@ public class InMemoryTaskManager implements TaskManager {
         } else if (hasDone) {
             epic.setStatus(Status.DONE);
         }
+    }
+
+    public ArrayList<Task> getHistory() {
+        return historyManager.getHistory();
     }
 }

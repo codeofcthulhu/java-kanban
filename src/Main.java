@@ -1,11 +1,12 @@
 import manager.InMemoryTaskManager;
+import manager.Managers;
 import manager.TaskManager;
 import tasks.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new InMemoryTaskManager();
+        TaskManager taskManager = Managers.getDefult();
 
         System.out.println("Создаём три задачи:");
         Task task0 = new Task("Homework", "do homework", Status.NEW);
@@ -90,7 +91,9 @@ public class Main {
         epic1.setDescription("ОПИСАНИЕ ОБНОВЛЕНО");
         System.out.println(taskManager.updateSubTask(subTask13));
         System.out.println(taskManager.updateEpic(epic1));
-
+        System.out.println("ИСТОРИЯ");
+        System.out.println(taskManager.getHistory());
+        System.out.println("ИСТОРИЯ ЗАВЕРШЕНА");
         System.out.println("Удаляем второй сабтаск первого эпика");
         System.out.println(taskManager.deleteSubTaskById(5));
         System.out.println(taskManager.getAllSubTasksOfOneEpic(epic0.getId()));
