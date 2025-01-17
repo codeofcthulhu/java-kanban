@@ -6,7 +6,7 @@ import tasks.*;
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefult();
+        TaskManager taskManager = Managers.getDefault();
 
         System.out.println("Создаём три задачи:");
         Task task0 = new Task("Homework", "do homework", Status.NEW);
