@@ -9,6 +9,7 @@ import tasks.SubTask;
 import tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -312,7 +313,7 @@ class InMemoryTaskManagerTest {
                 "Пойти потрогать траву, поглядеть на небо", Status.NEW, epic2.getId());
         taskManager.createSubTask(subTask5);
 
-        ArrayList<SubTask> resultList = taskManager.getAllSubTasks();
+        List<SubTask> resultList = taskManager.getAllSubTasks();
 
         Assertions.assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
         Assertions.assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
@@ -466,7 +467,7 @@ class InMemoryTaskManagerTest {
         Epic epic2 = new Epic("Отдохнуть от Unit тестов", "Делать что угодно кроме тестов");
         taskManager.createEpic(epic2);
 
-        ArrayList<Epic> epics = taskManager.getAllEpics();
+        List<Epic> epics = taskManager.getAllEpics();
 
         Assertions.assertEquals("Придумать много тестов", epics.get(0).getName());
         Assertions.assertEquals("Написать хотя бы один тест", epics.get(0).getDescription());
@@ -553,7 +554,7 @@ class InMemoryTaskManagerTest {
                 "Написать тест к методу", Status.NEW, epic1.getId());
         taskManager.createSubTask(subTask);
 
-        ArrayList<SubTask> resultList = taskManager.getAllSubTasksOfOneEpic(0);
+        List<SubTask> resultList = taskManager.getAllSubTasksOfOneEpic(0);
 
         Assertions.assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
         Assertions.assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
@@ -614,7 +615,7 @@ class InMemoryTaskManagerTest {
         taskManager.getTaskById(8);
         taskManager.getTaskById(9);
 
-        ArrayList<Task> historyList = taskManager.getHistory();
+        List<Task> historyList = taskManager.getHistory();
 
         Assertions.assertEquals(0, historyList.get(0).getId());
         Assertions.assertEquals(1, historyList.get(1).getId());
