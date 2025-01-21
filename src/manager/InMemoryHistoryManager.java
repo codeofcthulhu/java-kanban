@@ -9,9 +9,11 @@ import java.util.List;
 public class InMemoryHistoryManager implements HistoryManager{
     private List<Task> history;
     private static final int HISTORY_SIZE = 10;
+
     public InMemoryHistoryManager() {
         history = new LinkedList<>();
     }
+
     @Override
     public void add(Task task) {
         if (task == null) {
