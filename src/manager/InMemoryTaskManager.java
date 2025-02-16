@@ -45,12 +45,11 @@ public class InMemoryTaskManager implements TaskManager {
             return task;
         }
         return null;
-
-
     }
 
     @Override
     public Task deleteTaskById(Integer id) {
+        historyManager.remove(id);
         return tasks.remove(id);
     }
 
@@ -80,6 +79,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTasks() {
+        for (Task task : tasks.values()) {
+            historyManager.remove(task.getId());
+        }
         tasks.clear();
     }
 
@@ -113,6 +115,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public SubTask deleteSubTaskById(int id) {
         SubTask subTask = subTasks.remove(id);
+        historyManager.remove(id);
         Epic epic = epics.get(subTask.getEpicId());
         epic.deleteSubTaskById(id);
         updateEpic(epic);
@@ -144,6 +147,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubTasks() {
+        for (SubTask subTask : subTasks.values()) {
+            historyManager.remove(subTask.getId());
+        }
         subTasks.clear();
         for (Epic epic : epics.values()) {
             epic.deleteAllSubTasks();
@@ -172,6 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Epic deleteEpicById(Integer id) {
         Epic epic = epics.remove(id);
+        historyManager.remove(epic.getId());
         for (Integer idOfSubTask : epic.getSubTasksIds()) {
             subTasks.remove(idOfSubTask);
         }
@@ -203,13 +210,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllEpics() {
+        for (Epic epic : epics.values()) {
+            historyManager.remove(epic.getId());
+        }
+        for (SubTask subTask : subTasks.values()) {
+            historyManager.remove(subTask.getId());
+        }
         epics.clear();
         subTasks.clear();
     }
 
     @Override
     public List<SubTask> getAllSubTasksOfOneEpic(int id) {
-        ArrayList<SubTask> listOfSubTasks = new ArrayList<>();
+        List<SubTask> listOfSubTasks = new ArrayList<>();
         Epic epic = epics.get(id);
         for (Integer idOfSubTask : epic.getSubTasksIds()) {
             listOfSubTasks.add(new SubTask(subTasks.get(idOfSubTask)));
