@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
     private Map<Integer, Node> history;
     private Node head;
     private Node tail;
@@ -32,22 +32,33 @@ public class InMemoryHistoryManager implements HistoryManager{
         history = new HashMap<>();
     }
 
-    public void linkLast(Task task) {
-        Node node = new Node(null, tail, task);
-        tail.next = node;
+    private void linkLast(Task task) {
+        Node node;
+        if (tail == null) {
+            node = new Node(null, null, task);
+            head = node;
+        } else {
+            node = new Node(null, tail, task);
+            tail.next = node;
+        }
         tail = node;
     }
 
     private void removeNode(Node node) {
-        Node nodePrevious = node.previous;
-        Node nodeNext = node.next;
-        if (node == head) {
+        if ((node == head) && (node == tail)) {
+            head = null;
+            tail = null;
+        } else if (node == head) {
+            Node nodeNext = node.next;
             head = nodeNext;
             nodeNext.previous = null;
         } else if (node == tail) {
+            Node nodePrevious = node.previous;
             tail = nodePrevious;
             nodePrevious.next = null;
         } else {
+            Node nodeNext = node.next;
+            Node nodePrevious = node.previous;
             nodePrevious.next = nodeNext;
             nodeNext.previous = nodePrevious;
         }
@@ -62,6 +73,13 @@ public class InMemoryHistoryManager implements HistoryManager{
         }
         return historyList;
     }
+
+/*    private boolean isNodesEmpty() {
+        if ((head == null) && (tail == null)) {
+            return true;
+        }
+        return false;
+    }*/
 
     @Override
     public void add(Task task) {
@@ -86,8 +104,10 @@ public class InMemoryHistoryManager implements HistoryManager{
 
     @Override
     public void remove(int id) {
-        removeNode(history.get(id));
-        history.remove(id);
+        if (history.containsKey(id)) {
+            removeNode(history.get(id));
+            history.remove(id);
+        }
     }
 
     @Override

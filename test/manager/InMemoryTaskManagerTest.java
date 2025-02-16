@@ -617,15 +617,18 @@ class InMemoryTaskManagerTest {
 
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(0, historyList.get(0).getId());
-        Assertions.assertEquals(1, historyList.get(1).getId());
-        Assertions.assertEquals(2, historyList.get(2).getId());
-        Assertions.assertEquals(3, historyList.get(3).getId());
-        Assertions.assertEquals(4, historyList.get(4).getId());
-        Assertions.assertEquals(5, historyList.get(5).getId());
-        Assertions.assertEquals(6, historyList.get(6).getId());
-        Assertions.assertEquals(7, historyList.get(7).getId());
-        Assertions.assertEquals(8, historyList.get(8).getId());
-        Assertions.assertEquals(9, historyList.get(9).getId());
+        Assertions.assertEquals(10, historyList.get(0).getId());
+        Assertions.assertEquals(11, historyList.get(1).getId());
+        Assertions.assertEquals(12, historyList.get(2).getId());
+        Assertions.assertEquals(0, historyList.get(3).getId());
+        Assertions.assertEquals(1, historyList.get(4).getId());
+        Assertions.assertEquals(2, historyList.get(5).getId());
+        Assertions.assertEquals(3, historyList.get(6).getId());
+        Assertions.assertEquals(4, historyList.get(7).getId());
+        Assertions.assertEquals(5, historyList.get(8).getId());
+        Assertions.assertEquals(6, historyList.get(9).getId());
+        Assertions.assertEquals(7, historyList.get(10).getId());
+        Assertions.assertEquals(8, historyList.get(11).getId());
+        Assertions.assertEquals(9, historyList.get(12).getId());
     }
 }
