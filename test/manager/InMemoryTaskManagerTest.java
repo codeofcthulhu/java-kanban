@@ -246,7 +246,7 @@ class InMemoryTaskManagerTest {
     @Test
     void statusDescriptionAndNameOfSubTaskShouldBeuUpdatedEpicsStatusShouldBeUpdatedToo() {
         Epic epic = new Epic("Придумать много тестов", "Написать хотя бы один тест");
-        Epic epicResult = taskManager.createEpic(epic);
+        taskManager.createEpic(epic);
         SubTask subTask = new SubTask("Придумать тест к методу сабтаска",
                 "Написать тест к методу createNewSubTask", Status.NEW, epic.getId());
         taskManager.createSubTask(subTask);
@@ -259,11 +259,11 @@ class InMemoryTaskManagerTest {
 
         SubTask subTaskResult = taskManager.updateSubTask(updatedSubTask);
 
-        Assertions.assertEquals("Придумать много тестов", epicResult.getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epicResult.getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, epicResult.getStatus());
-        Assertions.assertEquals(0, epicResult.getId());
-        Assertions.assertEquals(expectedListOfSubTaskIds, epicResult.getSubTasksIds());
+        Assertions.assertEquals("Придумать много тестов", taskManager.getEpicById(0).getName());
+        Assertions.assertEquals("Написать хотя бы один тест", taskManager.getEpicById(0).getDescription());
+        Assertions.assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(0).getStatus());
+        Assertions.assertEquals(0, taskManager.getEpicById(0).getId());
+        Assertions.assertEquals(expectedListOfSubTaskIds, taskManager.getEpicById(0).getSubTasksIds());
         Assertions.assertEquals("Придумать тест к методам сабтаска", subTaskResult.getName());
         Assertions.assertEquals("Написать тесты к методам createNewSubTask и updateSubTask", subTaskResult.getDescription());
         Assertions.assertEquals(Status.IN_PROGRESS, subTaskResult.getStatus());

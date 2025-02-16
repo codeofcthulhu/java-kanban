@@ -3,10 +3,24 @@ import manager.Managers;
 import manager.TaskManager;
 import tasks.*;
 
+import java.util.ArrayList;
+
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
+        TaskManager taskManager;
+        taskManager = Managers.getDefault();
+        Epic epic = new Epic("Придумать много тестов", "Написать хотя бы один тест");
+        taskManager.createEpic(epic);
+        SubTask subTask = new SubTask("Придумать тест к методу сабтаска",
+                "Написать тест к методу createNewSubTask", Status.DONE, epic.getId());
+        taskManager.createSubTask(subTask);
+        SubTask updatedSubTask = new SubTask("Придумать тест к методам сабтаска",
+                "Написать тесты к методам createNewSubTask и updateSubTask",
+                Status.IN_PROGRESS, epic.getId());
+        updatedSubTask.setId(1);
+        taskManager.updateSubTask(updatedSubTask);
+        /*TaskManager taskManager = Managers.getDefault();
 
         System.out.println("Создаём три задачи:");
         Task task0 = new Task("Homework", "do homework", Status.NEW);
@@ -109,7 +123,7 @@ public class Main {
         taskManager.deleteAllEpics();
         System.out.println("Эпики: ");
         System.out.println(taskManager.getAllEpics());
-
+*/
 
 
     }
