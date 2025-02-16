@@ -34,7 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private void linkLast(Task task) {
         Node node;
-        if (tail == null) {
+        if (isNodesEmpty()) {
             node = new Node(null, null, task);
             head = node;
         } else {
@@ -65,6 +65,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private List<Task> getTasks() {
+        if (isNodesEmpty()) {
+            return null;
+        }
         Node node = head;
         ArrayList<Task> historyList = new ArrayList<>(history.size());
         while (node != null) {
@@ -74,12 +77,9 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyList;
     }
 
-/*    private boolean isNodesEmpty() {
-        if ((head == null) && (tail == null)) {
-            return true;
-        }
-        return false;
-    }*/
+    private boolean isNodesEmpty() {
+        return (head == null) && (tail == null);
+    }
 
     @Override
     public void add(Task task) {
