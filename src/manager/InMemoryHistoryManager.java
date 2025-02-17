@@ -114,6 +114,9 @@ public class InMemoryHistoryManager implements HistoryManager {
     public List<Task> getHistory() {
         ArrayList<Task> listToReturn = new ArrayList<>(history.size());
         List<Task> historyList = getTasks();
+        if (historyList == null) {
+            return null;
+        }
         for (Task task : historyList) {
             listToReturn.add(new Task(task));
         }
