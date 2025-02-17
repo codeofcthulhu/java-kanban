@@ -165,6 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
         epics.put(id, epicToAdd);
         return epic;
     }
+
     @Override
     public Epic updateEpic(Epic epic) {
         if (epics.containsKey(epic.getId())) {
@@ -259,6 +260,7 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.DONE);
         }
     }
+
     @Override
     public List<Task> getHistory() {
         return historyManager.getHistory();
