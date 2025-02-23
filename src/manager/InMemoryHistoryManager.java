@@ -32,6 +32,48 @@ public class InMemoryHistoryManager implements HistoryManager {
         history = new HashMap<>();
     }
 
+    @Override
+    public void add(Task task) {
+        if (task == null) {
+            return;
+        } else if (history.isEmpty()) {
+            Node<Task> node = new Node<>(null, null, task);
+            head = node;
+            tail = node;
+            history.put(task.getId(), node);
+        } else if (history.containsKey(task.getId())) {
+            Node<Task> node = history.get(task.getId());
+            removeNode(node);
+            linkLast(task);
+            history.put(task.getId(), tail);
+        } else {
+            linkLast(task);
+            history.put(task.getId(), tail);
+        }
+
+    }
+
+    @Override
+    public void remove(int id) {
+        if (history.containsKey(id)) {
+            removeNode(history.get(id));
+            history.remove(id);
+        }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        ArrayList<Task> listToReturn = new ArrayList<>(history.size());
+        List<Task> historyList = getTasks();
+        if (historyList == null) {
+            return null;
+        }
+        for (Task task : historyList) {
+            listToReturn.add(new Task(task));
+        }
+        return listToReturn;
+    }
+
     private void linkLast(Task task) {
         Node<Task> node;
         if (isNodesEmpty()) {
@@ -79,47 +121,5 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private boolean isNodesEmpty() {
         return (head == null) && (tail == null);
-    }
-
-    @Override
-    public void add(Task task) {
-        if (task == null) {
-            return;
-        } else if (history.isEmpty()) {
-            Node<Task> node = new Node<>(null, null, task);
-            head = node;
-            tail = node;
-            history.put(task.getId(), node);
-        } else if (history.containsKey(task.getId())) {
-            Node<Task> node = history.get(task.getId());
-            removeNode(node);
-            linkLast(task);
-            history.put(task.getId(), tail);
-        } else {
-            linkLast(task);
-            history.put(task.getId(), tail);
-        }
-
-    }
-
-    @Override
-    public void remove(int id) {
-        if (history.containsKey(id)) {
-            removeNode(history.get(id));
-            history.remove(id);
-        }
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        ArrayList<Task> listToReturn = new ArrayList<>(history.size());
-        List<Task> historyList = getTasks();
-        if (historyList == null) {
-            return null;
-        }
-        for (Task task : historyList) {
-            listToReturn.add(new Task(task));
-        }
-        return listToReturn;
     }
 }
