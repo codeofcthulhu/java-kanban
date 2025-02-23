@@ -10,6 +10,7 @@ import tasks.Task;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -944,7 +945,7 @@ class InMemoryTaskManagerTest {
 
         taskManager.deleteEpicById(0);
 
-        Assertions.assertTrue(taskManager.getHistory() == null);
+        Assertions.assertTrue(taskManager.getHistory().equals(Collections.emptyList()));
 
     }
     @Test
