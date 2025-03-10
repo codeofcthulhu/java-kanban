@@ -18,7 +18,7 @@ import java.util.List;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private Path data;
-    private static final String DATA_HEAD = "id,type,name,status,description,epic";
+    private static final String DATA_HEAD = "id,type,name,status,description,epic\n";
 
     public FileBackedTaskManager(HistoryManager historyManager, Path data) {
         super(historyManager);
@@ -30,26 +30,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         int lastId = 0;
         try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
             List<String> allLines = Files.readAllLines(file);
-            allLines.removeFirst();
-            for (String line : allLines) {
-                Task task = fromString(line);
-                if (task != null) {
-                    if (lastId < task.getId()) lastId = task.getId();
-                    switch (task) {
-                        case Epic e -> {
-                            int id = e.getId();
-                            epics.put(id, e);
-                        }
-                        case SubTask s -> {
-                            int id = s.getId();
-                            subTasks.put(id, s);
-                            Epic epic = epics.get(s.getEpicId());
-                            epic.addSubTaskById(id);
-                            updateEpicStatus(epic);
-                        }
-                        case Task t -> {
-                            int id = t.getId();
-                            tasks.put(id, t);
+            if (allLines.isEmpty()) {
+                System.out.println("Файл пуст");
+            } else {
+                allLines.removeFirst();
+                for (String line : allLines) {
+                    Task task = fromString(line);
+                    if (task != null) {
+                        if (lastId < task.getId()) lastId = task.getId();
+                        switch (task) {
+                            case Epic e -> {
+                                int id = e.getId();
+                                epics.put(id, e);
+                            }
+                            case SubTask s -> {
+                                int id = s.getId();
+                                subTasks.put(id, s);
+                                Epic epic = epics.get(s.getEpicId());
+                                epic.addSubTaskById(id);
+                                updateEpicStatus(epic);
+                            }
+                            case Task t -> {
+                                int id = t.getId();
+                                tasks.put(id, t);
+                            }
                         }
                     }
                 }
@@ -122,12 +126,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             writer.write(DATA_HEAD);
             for (Task task : allTasks) {
                 writer.write(task.toString());
+                writer.newLine();
             }
             for (Epic epic : allEpics) {
                 writer.write(epic.toString());
+                writer.newLine();
             }
             for (SubTask subTask : allSubtasks) {
                 writer.write(subTask.toString());
+                writer.newLine();
             }
         } catch (IOException exception) {
             String errorMessage = "Ошибка сохранения в файл: " + exception.getMessage();
@@ -148,7 +155,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     public Task updateTask(Task task) {
         Task t = super.updateTask(task);
         save();
-        return(t);
+        return (t);
     }
 
     @Override

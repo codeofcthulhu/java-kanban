@@ -15,13 +15,14 @@ public class InMemoryTaskManager implements TaskManager {
     static protected Map<Integer, Epic> epics;
     static protected Map<Integer, SubTask> subTasks;
     private HistoryManager historyManager;
-    protected static int idCounter = 0;
+    protected static int idCounter;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
         this.historyManager = historyManager;
+        idCounter = 0;
     }
 
     private int generateNewId() {

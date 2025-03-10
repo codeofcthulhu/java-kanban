@@ -31,7 +31,7 @@ public class Epic extends Task {
     }
 
     public void deleteSubTaskById(int id) {
-        subTasksIds.remove(id);
+        subTasksIds.remove(Integer.valueOf(id));
     }
 
     public void deleteAllSubTasks() {
@@ -40,6 +40,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,", getId(), TasksTypes.TASK, getName(), getStatus(), getDescription());
+        return String.format("%d,%s,%s,%s,%s,", getId(), TasksTypes.EPIC, getName(), getStatus(), getDescription());
     }
 }
