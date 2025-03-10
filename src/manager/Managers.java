@@ -1,7 +1,13 @@
 package manager;
 
+import java.nio.file.Path;
+
 public class Managers {
     private Managers() {
+    }
+
+    public static TaskManager getFileBackedTaskManager(Path data) {
+        return new FileBackedTaskManager(getDefaultHistory(), data);
     }
 
     public static TaskManager getDefault() {
