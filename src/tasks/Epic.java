@@ -1,5 +1,7 @@
 package tasks;
 
+import manager.TasksTypes;
+
 import java.util.ArrayList;
 
 public class Epic extends Task {
@@ -29,7 +31,7 @@ public class Epic extends Task {
     }
 
     public void deleteSubTaskById(int id) {
-        subTasksIds.remove(Integer.valueOf(id));
+        subTasksIds.remove(id);
     }
 
     public void deleteAllSubTasks() {
@@ -38,12 +40,6 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return "\nEpic{" +
-                "name='" + getName() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
-                ", id=" + getId() +
-                ", subTasksIds=" + subTasksIds +
-                "}";
+        return String.format("%d,%s,%s,%s,%s,", getId(), TasksTypes.TASK, getName(), getStatus(), getDescription());
     }
 }
