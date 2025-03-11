@@ -15,12 +15,22 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-class FileBackedTaskManagerTest {
-    TaskManager taskManager;
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+
     Path tempFile;
 
+    @Override
+    protected FileBackedTaskManager createTaskManager() {
+        try {
+            tempFile = Files.createTempFile("data", ".csv");
+            return Managers.getFileBackedTaskManager(tempFile);
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось создать временный файл", e);
+        }
+    }
+
     @BeforeEach
-    public void init() throws IOException {
+    public void setUp() throws IOException {
         tempFile = Files.createTempFile("data", ".csv");
         System.out.println("Временный файл создан: " + tempFile);
         taskManager = Managers.getFileBackedTaskManager(tempFile);

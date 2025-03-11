@@ -6,11 +6,11 @@ public class Managers {
     private Managers() {
     }
 
-    public static TaskManager getFileBackedTaskManager(Path data) {
+    public static FileBackedTaskManager getFileBackedTaskManager(Path data) {
         return new FileBackedTaskManager(getDefaultHistory(), data);
     }
 
-    public static TaskManager getDefault() {
+    public static InMemoryTaskManager getDefault() {
         return new InMemoryTaskManager(getDefaultHistory());
     }
 
