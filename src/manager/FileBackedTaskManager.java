@@ -13,7 +13,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -22,6 +24,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public FileBackedTaskManager(HistoryManager historyManager, Path data) {
         super(historyManager);
+        this.data = data;
+    }
+
+    public FileBackedTaskManager(Map<Integer, Task> tasks, Map<Integer, Epic> epics, Map<Integer, SubTask> subTasks, int idCounter, HistoryManager historyManager, Path data) {
+        super(tasks, epics, subTasks, idCounter, historyManager);
         this.data = data;
     }
 
@@ -62,9 +69,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(Path file) {
-        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(new InMemoryHistoryManager(), file);
         int lastId = 0;
-        try (BufferedReader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+        Map<Integer, Task> tasksMap = new HashMap<>();
+        Map<Integer, Epic> epicsMap = new HashMap<>();
+        Map<Integer, SubTask> subTasksMap = new HashMap<>();
+        try {
             List<String> allLines = Files.readAllLines(file);
             if (allLines.isEmpty()) {
                 System.out.println("Файл пуст");
@@ -77,18 +86,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         switch (task) {
                             case Epic e -> {
                                 int id = e.getId();
-                                epics.put(id, e);
+                                epicsMap.put(id, e);
                             }
                             case SubTask s -> {
                                 int id = s.getId();
-                                subTasks.put(id, s);
-                                Epic epic = epics.get(s.getEpicId());
+                                subTasksMap.put(id, s);
+                                Epic epic = epicsMap.get(s.getEpicId());
                                 epic.addSubTaskById(id);
-                                updateEpicStatus(epic);
                             }
                             case Task t -> {
                                 int id = t.getId();
-                                tasks.put(id, t);
+                                tasksMap.put(id, t);
                             }
                         }
                     }
@@ -99,7 +107,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             System.out.println(errorMessage);
             throw new ManagerFileInitializationException(errorMessage);
         }
-        idCounter = lastId;
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tasksMap, epicsMap, subTasksMap, lastId,
+                Managers.getDefaultHistory(), file);
         return fileBackedTaskManager;
     }
 
@@ -107,10 +116,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String[] words = line.split(",");
         Task taskToReturn = null;
         try {
-            taskToReturn = switch (TasksTypes.valueOf(words[1])) {
+            String taskType = words[1];
+            taskToReturn = switch (TasksTypes.valueOf(taskType)) {
                 case TasksTypes.TASK -> {
                     try {
-                        Task task = new Task(words[2], words[4], Status.valueOf(words[3]));
+                        String taskName = words[2];
+                        String taskDescription = words[4];
+                        Status taskStatus = Status.valueOf(words[3]);
+                        Task task = new Task(taskName, taskDescription, taskStatus);
                         int id = Integer.parseInt(words[0]);
                         task.setId(id);
                         yield task;
@@ -124,7 +137,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 case TasksTypes.EPIC -> {
                     try {
-                        Task epic = new Epic(words[2], words[4]);
+                        String epicName = words[2];
+                        Status epicStatus = Status.valueOf(words[3]);
+                        String epicDescription = words[4];
+                        Task epic = new Epic(epicName, epicDescription, epicStatus);
                         int id = Integer.parseInt(words[0]);
                         epic.setId(id);
                         yield epic;
@@ -135,7 +151,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
                 case TasksTypes.SUBTASK -> {
                     try {
-                        Task subTask = new SubTask(words[2], words[4], Status.valueOf(words[3]), Integer.parseInt(words[5]));
+                        String subTaskName = words[2];
+                        String subTaskDescription = words[4];
+                        Status subTaskStatus = Status.valueOf(words[3]);
+                        int subTaskEpicId = Integer.parseInt(words[5]);
+                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskEpicId);
                         int id = Integer.parseInt(words[0]);
                         subTask.setId(id);
                         yield subTask;

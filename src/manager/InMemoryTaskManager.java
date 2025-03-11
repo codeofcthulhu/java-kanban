@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    protected static Map<Integer, Task> tasks;
-    protected static Map<Integer, Epic> epics;
-    protected static Map<Integer, SubTask> subTasks;
-    protected static int idCounter;
+    protected Map<Integer, Task> tasks;
+    protected Map<Integer, Epic> epics;
+    protected Map<Integer, SubTask> subTasks;
+    protected int idCounter;
     private HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
@@ -23,6 +23,14 @@ public class InMemoryTaskManager implements TaskManager {
         subTasks = new HashMap<>();
         this.historyManager = historyManager;
         idCounter = 0;
+    }
+
+    protected InMemoryTaskManager(Map<Integer, Task> tasks, Map<Integer, Epic> epics, Map<Integer, SubTask> subTasks, int idCounter, HistoryManager historyManager) {
+        this.tasks = tasks;
+        this.epics = epics;
+        this.subTasks = subTasks;
+        this.idCounter = idCounter;
+        this.historyManager = historyManager;
     }
 
     private int generateNewId() {
@@ -233,7 +241,7 @@ public class InMemoryTaskManager implements TaskManager {
         return listOfSubTasks;
     }
 
-    protected static void updateEpicStatus(Epic epic) {
+    protected void updateEpicStatus(Epic epic) {
         if (epic.getSubTasksIds().isEmpty()) {
             epic.setStatus(Status.NEW);
             return;
