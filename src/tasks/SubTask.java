@@ -1,5 +1,7 @@
 package tasks;
 
+import manager.TasksTypes;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -24,12 +26,6 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return "\nSubTask{" +
-                "name='" + getName() + '\'' +
-                ", description='" + getDescription() + '\'' +
-                ", status=" + getStatus() +
-                ", id=" + getId() +
-                ", epicId=" + epicId +
-                "}";
+        return String.format("%d,%s,%s,%s,%s,%d", getId(), TasksTypes.SUBTASK, getName(), getStatus(), getDescription(), getEpicId());
     }
 }
