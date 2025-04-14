@@ -314,6 +314,7 @@ public class InMemoryTaskManager implements TaskManager {
                     this.duration = duration;
                 }
             }
+
             Result result = subTasksIds.stream().map(id -> subTasks.get(id))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
                         Instant startTime = list.stream().map(Task::getStartTime).filter(Objects::nonNull)
