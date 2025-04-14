@@ -2,6 +2,8 @@ package tasks;
 
 import manager.TasksTypes;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 
 public class Task {
@@ -9,6 +11,8 @@ public class Task {
     private String description;
     private Status status;
     private int id;
+    private Instant startTime;
+    private Duration duration;
 
     public Task(String name, String description, Status status) {
         this.name = name;
@@ -21,6 +25,16 @@ public class Task {
         description = task.getDescription();
         status = task.getStatus();
         id = task.getId();
+        startTime = task.getStartTime();
+        duration = task.getDuration();
+    }
+
+    public Task(String name, String description, Status status, Instant startTime, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.startTime = startTime;
+        this.duration = duration;
     }
 
     public String getName() {
@@ -51,8 +65,29 @@ public class Task {
         return id;
     }
 
+    public Instant getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
     public void setId(int id) {
         this.id = id;
+    }
+
+    public Instant getEndTime() {
+        Instant endTime = startTime.plus(duration);
+        return endTime;
     }
 
     @Override
@@ -69,6 +104,21 @@ public class Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,", id, TasksTypes.TASK, name, status,description);
+        Long durationInMinutes;
+        if (getDuration() == null) {
+            durationInMinutes = null;
+        } else {
+            durationInMinutes = duration.toMinutes();
+        }
+        return String.format(
+                "%d,%s,%s,%s,%s,%s,,%d,",
+                id,
+                TasksTypes.TASK,
+                name,
+                status,
+                description,
+                startTime,
+                durationInMinutes
+        );
     }
 }

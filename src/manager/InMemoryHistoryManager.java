@@ -5,12 +5,14 @@ import tasks.Task;
 import java.util.*;
 
 public class InMemoryHistoryManager implements HistoryManager {
+
     private Map<Integer, Node<Task>> history;
     private Node<Task> head;
     private Node<Task> tail;
 
 
     private static class Node<T> {
+
         private Node<T> next;
         private Node<T> previous;
         private T t;

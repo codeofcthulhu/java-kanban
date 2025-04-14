@@ -2,14 +2,18 @@ package tasks;
 
 import manager.TasksTypes;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subTasksIds;
+    private Instant endTime;
 
-    public Epic(String name, String description, Status status) {
-        super(name, description, status);
+    public Epic(String name, String description, Status status, Instant startTime, Instant endTime, Duration duration) {
+        super(name, description, status, startTime, duration);
         subTasksIds = new ArrayList<>();
+        this.endTime = endTime;
     }
 
     public Epic(String name, String description) {
@@ -18,9 +22,18 @@ public class Epic extends Task {
     }
 
     public Epic(Epic epic) {
-        super(epic.getName(), epic.getDescription(), epic.getStatus());
+        super(epic.getName(), epic.getDescription(), epic.getStatus(), epic.getStartTime(), epic.getDuration());
         this.setId(epic.getId());
         subTasksIds = epic.getSubTasksIds();
+    }
+
+    @Override
+    public Instant getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Instant endTime) {
+        this.endTime = endTime;
     }
 
     public ArrayList<Integer> getSubTasksIds() {
@@ -45,6 +58,22 @@ public class Epic extends Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,", getId(), TasksTypes.EPIC, getName(), getStatus(), getDescription());
+        Long durationInMinutes;
+        if (getDuration() == null) {
+            durationInMinutes = null;
+        } else {
+            durationInMinutes = getDuration().toMinutes();
+        }
+        return String.format(
+                "%d,%s,%s,%s,%s,%s,%s,%d,",
+                getId(),
+                TasksTypes.EPIC,
+                getName(),
+                getStatus(),
+                getDescription(),
+                getStartTime(),
+                getEndTime(),
+                durationInMinutes
+        );
     }
 }

@@ -66,10 +66,10 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
         List<String> allLines = Files.readAllLines(tempFile);
         List<String> allExpectedLines = new ArrayList<>(4);
-        allExpectedLines.add("id,type,name,status,description,epic");
-        allExpectedLines.add("0,TASK,Заголовок первого таска,NEW,Описание первого таска,");
-        allExpectedLines.add("1,EPIC,Заголовок первого эпика,DONE,Описание первого эпика,");
-        allExpectedLines.add("2,SUBTASK,Заголовок первого сабтаска,DONE,Описание первого сабтаска,1");
+        allExpectedLines.add("id,type,name,status,description,startTime,endTime,duration,epic");
+        allExpectedLines.add("0,TASK,Заголовок первого таска,NEW,Описание первого таска,null,,null,");
+        allExpectedLines.add("1,EPIC,Заголовок первого эпика,DONE,Описание первого эпика,null,null,null,");
+        allExpectedLines.add("2,SUBTASK,Заголовок первого сабтаска,DONE,Описание первого сабтаска,null,,null,1");
 
         Assertions.assertTrue(allLines.equals(allExpectedLines));
     }

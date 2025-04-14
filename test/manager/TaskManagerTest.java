@@ -1,5 +1,16 @@
 package manager;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import exceptions.TaskOverlapException;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +42,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task0);
         task1.setId(0);
 
-        Assertions.assertTrue(task0.equals(task1));
+        assertTrue(task0.equals(task1));
     }
 
     @Test
@@ -42,12 +53,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         epic.setId(0);
         subTask.setId(0);
 
-        Assertions.assertTrue(epic.equals(subTask));
+        assertTrue(epic.equals(subTask));
     }
 
     @Test
     void managersClassMethodsShouldCreateReadyToUseInstancesOfManagers() {
-        Assertions.assertTrue(taskManager != null);
+        assertTrue(taskManager != null);
     }
 
     @Test
@@ -63,12 +74,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task resultById1 = taskManager.getEpicById(1);
         Task resultById2 = taskManager.getSubTaskById(2);
 
-        Assertions.assertTrue(resultById0 instanceof Task);
-        Assertions.assertTrue(resultById1 instanceof Epic);
-        Assertions.assertTrue(resultById2 instanceof SubTask);
-        Assertions.assertEquals(0, resultById0.getId());
-        Assertions.assertEquals(1, resultById1.getId());
-        Assertions.assertEquals(2, resultById2.getId());
+        assertTrue(resultById0 instanceof Task);
+        assertTrue(resultById1 instanceof Epic);
+        assertTrue(resultById2 instanceof SubTask);
+        assertEquals(0, resultById0.getId());
+        assertEquals(1, resultById1.getId());
+        assertEquals(2, resultById2.getId());
 
     }
 
@@ -81,7 +92,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         task1.setId(0);
         taskManager.createTask(task1);
 
-        Assertions.assertTrue(task0.getId() != task1.getId());
+        assertTrue(task0.getId() != task1.getId());
     }
 
     @Test
@@ -90,19 +101,19 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Task addedTask = taskManager.createTask(task0);
 
-        Assertions.assertEquals(addedTask.getName(), task0.getName());
-        Assertions.assertEquals(addedTask.getDescription(), task0.getDescription());
-        Assertions.assertEquals(addedTask.getStatus(), task0.getStatus());
+        assertEquals(addedTask.getName(), task0.getName());
+        assertEquals(addedTask.getDescription(), task0.getDescription());
+        assertEquals(addedTask.getStatus(), task0.getStatus());
     }
 
     @Test
     void shouldCreateTaskWithZeroId() {
         Task task = new Task("Придумать много тестов", "Написать хотя бы один тест", Status.NEW);
         Task taskResult = taskManager.createTask(task);
-        Assertions.assertEquals(0, taskResult.getId());
-        Assertions.assertEquals("Придумать много тестов", taskResult.getName());
-        Assertions.assertEquals("Написать хотя бы один тест", taskResult.getDescription());
-        Assertions.assertEquals(Status.NEW, taskResult.getStatus());
+        assertEquals(0, taskResult.getId());
+        assertEquals("Придумать много тестов", taskResult.getName());
+        assertEquals("Написать хотя бы один тест", taskResult.getDescription());
+        assertEquals(Status.NEW, taskResult.getStatus());
     }
 
     @Test
@@ -114,10 +125,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Task taskResult = taskManager.updateTask(updatedTask);
 
-        Assertions.assertEquals(0, taskResult.getId());
-        Assertions.assertEquals("Придумать достаточно много тестов", taskResult.getName());
-        Assertions.assertEquals("Написать хотя бы три теста", taskResult.getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, taskResult.getStatus());
+        assertEquals(0, taskResult.getId());
+        assertEquals("Придумать достаточно много тестов", taskResult.getName());
+        assertEquals("Написать хотя бы три теста", taskResult.getDescription());
+        assertEquals(Status.IN_PROGRESS, taskResult.getStatus());
     }
 
     @Test
@@ -150,22 +161,22 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         ArrayList<Task> resultList = new ArrayList<>(taskManager.getAllTasks());
 
-        Assertions.assertEquals(0, resultList.get(0).getId());
-        Assertions.assertEquals("Придумать много тестов", resultList.get(0).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", resultList.get(0).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(0).getStatus());
-        Assertions.assertEquals(1, resultList.get(1).getId());
-        Assertions.assertEquals("Придумать ещё больше тестов", resultList.get(1).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", resultList.get(1).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(1).getStatus());
-        Assertions.assertEquals(2, resultList.get(2).getId());
-        Assertions.assertEquals("Придумать максимум тестов", resultList.get(2).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", resultList.get(2).getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, resultList.get(2).getStatus());
-        Assertions.assertEquals(3, resultList.get(3).getId());
-        Assertions.assertEquals("Сделать тесты по тз", resultList.get(3).getName());
-        Assertions.assertEquals("Написать хотя бы пару тестов", resultList.get(3).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(3).getStatus());
+        assertEquals(0, resultList.get(0).getId());
+        assertEquals("Придумать много тестов", resultList.get(0).getName());
+        assertEquals("Написать хотя бы один тест", resultList.get(0).getDescription());
+        assertEquals(Status.NEW, resultList.get(0).getStatus());
+        assertEquals(1, resultList.get(1).getId());
+        assertEquals("Придумать ещё больше тестов", resultList.get(1).getName());
+        assertEquals("Написать хотя бы один тест", resultList.get(1).getDescription());
+        assertEquals(Status.NEW, resultList.get(1).getStatus());
+        assertEquals(2, resultList.get(2).getId());
+        assertEquals("Придумать максимум тестов", resultList.get(2).getName());
+        assertEquals("Написать хотя бы один тест", resultList.get(2).getDescription());
+        assertEquals(Status.IN_PROGRESS, resultList.get(2).getStatus());
+        assertEquals(3, resultList.get(3).getId());
+        assertEquals("Сделать тесты по тз", resultList.get(3).getName());
+        assertEquals("Написать хотя бы пару тестов", resultList.get(3).getDescription());
+        assertEquals(Status.NEW, resultList.get(3).getStatus());
     }
 
     @Test
@@ -179,7 +190,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Task resultTask = taskManager.getTaskById(1);
 
-        Assertions.assertEquals(task1, resultTask);
+        assertEquals(task1, resultTask);
     }
 
     @Test
@@ -195,7 +206,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteAllTasks();
 
-        Assertions.assertEquals(new ArrayList<>(), taskManager.getAllTasks());
+        assertEquals(new ArrayList<>(), taskManager.getAllTasks());
     }
 
     @Test
@@ -209,16 +220,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         SubTask subTaskResult = taskManager.createSubTask(subTask);
 
-        Assertions.assertEquals("Придумать много тестов", epicResult.getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epicResult.getDescription());
-        Assertions.assertEquals(Status.NEW, epicResult.getStatus());
-        Assertions.assertEquals(0, epicResult.getId());
-        Assertions.assertEquals(expectedListOfSubTaskIds, epicResult.getSubTasksIds());
-        Assertions.assertEquals("Придумать тест к методу сабтаска", subTaskResult.getName());
-        Assertions.assertEquals("Написать тест к методу createNewSubTask", subTaskResult.getDescription());
-        Assertions.assertEquals(Status.NEW, subTaskResult.getStatus());
-        Assertions.assertEquals(1, subTaskResult.getId());
-        Assertions.assertEquals(0, subTaskResult.getEpicId());
+        assertEquals("Придумать много тестов", epicResult.getName());
+        assertEquals("Написать хотя бы один тест", epicResult.getDescription());
+        assertEquals(Status.NEW, epicResult.getStatus());
+        assertEquals(0, epicResult.getId());
+        assertEquals(expectedListOfSubTaskIds, epicResult.getSubTasksIds());
+        assertEquals("Придумать тест к методу сабтаска", subTaskResult.getName());
+        assertEquals("Написать тест к методу createNewSubTask", subTaskResult.getDescription());
+        assertEquals(Status.NEW, subTaskResult.getStatus());
+        assertEquals(1, subTaskResult.getId());
+        assertEquals(0, subTaskResult.getEpicId());
     }
 
 
@@ -238,16 +249,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         SubTask subTaskResult = taskManager.updateSubTask(updatedSubTask);
 
-        Assertions.assertEquals("Придумать много тестов", taskManager.getEpicById(0).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", taskManager.getEpicById(0).getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(0).getStatus());
-        Assertions.assertEquals(0, taskManager.getEpicById(0).getId());
-        Assertions.assertEquals(expectedListOfSubTaskIds, taskManager.getEpicById(0).getSubTasksIds());
-        Assertions.assertEquals("Придумать тест к методам сабтаска", subTaskResult.getName());
-        Assertions.assertEquals("Написать тесты к методам createNewSubTask и updateSubTask", subTaskResult.getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, subTaskResult.getStatus());
-        Assertions.assertEquals(1, subTaskResult.getId());
-        Assertions.assertEquals(0, subTaskResult.getEpicId());
+        assertEquals("Придумать много тестов", taskManager.getEpicById(0).getName());
+        assertEquals("Написать хотя бы один тест", taskManager.getEpicById(0).getDescription());
+        assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(0).getStatus());
+        assertEquals(0, taskManager.getEpicById(0).getId());
+        assertEquals(expectedListOfSubTaskIds, taskManager.getEpicById(0).getSubTasksIds());
+        assertEquals("Придумать тест к методам сабтаска", subTaskResult.getName());
+        assertEquals("Написать тесты к методам createNewSubTask и updateSubTask", subTaskResult.getDescription());
+        assertEquals(Status.IN_PROGRESS, subTaskResult.getStatus());
+        assertEquals(1, subTaskResult.getId());
+        assertEquals(0, subTaskResult.getEpicId());
     }
 
     @Test
@@ -261,7 +272,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteSubTaskById(1);
 
         Assertions.assertNull(taskManager.getTaskById(1));
-        Assertions.assertEquals(new ArrayList<>(), taskManager.getAllSubTasksOfOneEpic(0));
+        assertEquals(new ArrayList<>(), taskManager.getAllSubTasksOfOneEpic(0));
     }
 
     @Test
@@ -294,36 +305,36 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         List<SubTask> resultList = taskManager.getAllSubTasks();
 
-        Assertions.assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
-        Assertions.assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(0).getStatus());
-        Assertions.assertEquals(1, resultList.get(0).getId());
-        Assertions.assertEquals(0, resultList.get(0).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу сабтаска", resultList.get(1).getName());
-        Assertions.assertEquals("Написать тест к методу createSubTask", resultList.get(1).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(1).getStatus());
-        Assertions.assertEquals(2, resultList.get(1).getId());
-        Assertions.assertEquals(0, resultList.get(1).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу эпика", resultList.get(2).getName());
-        Assertions.assertEquals("Написать тест к методу createEpic", resultList.get(2).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(2).getStatus());
-        Assertions.assertEquals(3, resultList.get(2).getId());
-        Assertions.assertEquals(0, resultList.get(2).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу InMemoryTaskManager", resultList.get(3).getName());
-        Assertions.assertEquals("Написать тест к методу", resultList.get(3).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(3).getStatus());
-        Assertions.assertEquals(5, resultList.get(3).getId());
-        Assertions.assertEquals(4, resultList.get(3).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу HistoryManager", resultList.get(4).getName());
-        Assertions.assertEquals("Написать тест к методу", resultList.get(4).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(4).getStatus());
-        Assertions.assertEquals(6, resultList.get(4).getId());
-        Assertions.assertEquals(4, resultList.get(4).getEpicId());
-        Assertions.assertEquals("Единение с природой", resultList.get(5).getName());
-        Assertions.assertEquals("Пойти потрогать траву, поглядеть на небо", resultList.get(5).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(5).getStatus());
-        Assertions.assertEquals(8, resultList.get(5).getId());
-        Assertions.assertEquals(7, resultList.get(5).getEpicId());
+        assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
+        assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
+        assertEquals(Status.NEW, resultList.get(0).getStatus());
+        assertEquals(1, resultList.get(0).getId());
+        assertEquals(0, resultList.get(0).getEpicId());
+        assertEquals("Придумать тест к методу сабтаска", resultList.get(1).getName());
+        assertEquals("Написать тест к методу createSubTask", resultList.get(1).getDescription());
+        assertEquals(Status.NEW, resultList.get(1).getStatus());
+        assertEquals(2, resultList.get(1).getId());
+        assertEquals(0, resultList.get(1).getEpicId());
+        assertEquals("Придумать тест к методу эпика", resultList.get(2).getName());
+        assertEquals("Написать тест к методу createEpic", resultList.get(2).getDescription());
+        assertEquals(Status.NEW, resultList.get(2).getStatus());
+        assertEquals(3, resultList.get(2).getId());
+        assertEquals(0, resultList.get(2).getEpicId());
+        assertEquals("Придумать тест к методу InMemoryTaskManager", resultList.get(3).getName());
+        assertEquals("Написать тест к методу", resultList.get(3).getDescription());
+        assertEquals(Status.NEW, resultList.get(3).getStatus());
+        assertEquals(5, resultList.get(3).getId());
+        assertEquals(4, resultList.get(3).getEpicId());
+        assertEquals("Придумать тест к методу HistoryManager", resultList.get(4).getName());
+        assertEquals("Написать тест к методу", resultList.get(4).getDescription());
+        assertEquals(Status.NEW, resultList.get(4).getStatus());
+        assertEquals(6, resultList.get(4).getId());
+        assertEquals(4, resultList.get(4).getEpicId());
+        assertEquals("Единение с природой", resultList.get(5).getName());
+        assertEquals("Пойти потрогать траву, поглядеть на небо", resultList.get(5).getDescription());
+        assertEquals(Status.NEW, resultList.get(5).getStatus());
+        assertEquals(8, resultList.get(5).getId());
+        assertEquals(7, resultList.get(5).getEpicId());
     }
 
     @Test
@@ -342,11 +353,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         SubTask subTaskResult = taskManager.getSubTaskById(3);
 
-        Assertions.assertEquals("Придумать тест к методу эпика", subTaskResult.getName());
-        Assertions.assertEquals("Написать тест к методу createEpic", subTaskResult.getDescription());
-        Assertions.assertEquals(Status.NEW, subTaskResult.getStatus());
-        Assertions.assertEquals(0, subTaskResult.getEpicId());
-        Assertions.assertEquals(3, subTaskResult.getId());
+        assertEquals("Придумать тест к методу эпика", subTaskResult.getName());
+        assertEquals("Написать тест к методу createEpic", subTaskResult.getDescription());
+        assertEquals(Status.NEW, subTaskResult.getStatus());
+        assertEquals(0, subTaskResult.getEpicId());
+        assertEquals(3, subTaskResult.getId());
 
     }
 
@@ -380,7 +391,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteAllSubTasks();
 
-        Assertions.assertEquals(new ArrayList<>(), taskManager.getAllSubTasks());
+        assertEquals(new ArrayList<>(), taskManager.getAllSubTasks());
     }
 
     @Test
@@ -396,14 +407,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         ArrayList<Integer> resultListForEpic2 = new ArrayList<>();
         resultListForEpic2.add(subTask.getId());
 
-        Assertions.assertEquals("Придумать много тестов", epicResult0.getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epicResult0.getDescription());
-        Assertions.assertEquals(0, epicResult0.getId());
-        Assertions.assertEquals(new ArrayList<>(), epicResult0.getSubTasksIds());
-        Assertions.assertEquals("Придумать много тестов для объектов пакета менеджера", epicResult1.getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epicResult1.getDescription());
-        Assertions.assertEquals(1, epicResult1.getId());
-        Assertions.assertEquals(resultListForEpic2, epicResult1.getSubTasksIds());
+        assertEquals("Придумать много тестов", epicResult0.getName());
+        assertEquals("Написать хотя бы один тест", epicResult0.getDescription());
+        assertEquals(0, epicResult0.getId());
+        assertEquals(new ArrayList<>(), epicResult0.getSubTasksIds());
+        assertEquals("Придумать много тестов для объектов пакета менеджера", epicResult1.getName());
+        assertEquals("Написать хотя бы один тест", epicResult1.getDescription());
+        assertEquals(1, epicResult1.getId());
+        assertEquals(resultListForEpic2, epicResult1.getSubTasksIds());
 
 
     }
@@ -417,8 +428,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Epic epicResult = taskManager.updateEpic(epicUpdated);
 
-        Assertions.assertEquals("Придумать много различных тестов", epicResult.getName());
-        Assertions.assertEquals("Написать много много тестов", epicResult.getDescription());
+        assertEquals("Придумать много различных тестов", epicResult.getName());
+        assertEquals("Написать много много тестов", epicResult.getDescription());
 
 
     }
@@ -448,18 +459,18 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         List<Epic> epics = taskManager.getAllEpics();
 
-        Assertions.assertEquals("Придумать много тестов", epics.get(0).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epics.get(0).getDescription());
-        Assertions.assertEquals(0, epics.get(0).getId());
-        Assertions.assertEquals(new ArrayList<>(), epics.get(0).getSubTasksIds());
-        Assertions.assertEquals("Придумать много тестов для объектов пакета менеджера", epics.get(1).getName());
-        Assertions.assertEquals("Написать хотя бы один тест", epics.get(1).getDescription());
-        Assertions.assertEquals(1, epics.get(1).getId());
-        Assertions.assertEquals(new ArrayList<>(), epics.get(1).getSubTasksIds());
-        Assertions.assertEquals("Отдохнуть от Unit тестов", epics.get(2).getName());
-        Assertions.assertEquals("Делать что угодно кроме тестов", epics.get(2).getDescription());
-        Assertions.assertEquals(2, epics.get(2).getId());
-        Assertions.assertEquals(new ArrayList<>(), epics.get(2).getSubTasksIds());
+        assertEquals("Придумать много тестов", epics.get(0).getName());
+        assertEquals("Написать хотя бы один тест", epics.get(0).getDescription());
+        assertEquals(0, epics.get(0).getId());
+        assertEquals(new ArrayList<>(), epics.get(0).getSubTasksIds());
+        assertEquals("Придумать много тестов для объектов пакета менеджера", epics.get(1).getName());
+        assertEquals("Написать хотя бы один тест", epics.get(1).getDescription());
+        assertEquals(1, epics.get(1).getId());
+        assertEquals(new ArrayList<>(), epics.get(1).getSubTasksIds());
+        assertEquals("Отдохнуть от Unit тестов", epics.get(2).getName());
+        assertEquals("Делать что угодно кроме тестов", epics.get(2).getDescription());
+        assertEquals(2, epics.get(2).getId());
+        assertEquals(new ArrayList<>(), epics.get(2).getSubTasksIds());
 
     }
 
@@ -484,10 +495,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         Epic resultEpic = taskManager.getEpicById(5);
 
-        Assertions.assertEquals("Отдохнуть от Unit тестов", resultEpic.getName());
-        Assertions.assertEquals("Делать что угодно кроме тестов", resultEpic.getDescription());
-        Assertions.assertEquals(5, resultEpic.getId());
-        Assertions.assertEquals(new ArrayList<>(), resultEpic.getSubTasksIds());
+        assertEquals("Отдохнуть от Unit тестов", resultEpic.getName());
+        assertEquals("Делать что угодно кроме тестов", resultEpic.getDescription());
+        assertEquals(5, resultEpic.getId());
+        assertEquals(new ArrayList<>(), resultEpic.getSubTasksIds());
     }
 
     @Test
@@ -511,7 +522,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteAllEpics();
 
-        Assertions.assertEquals(new ArrayList<>(), taskManager.getAllEpics());
+        assertEquals(new ArrayList<>(), taskManager.getAllEpics());
     }
 
     @Test
@@ -535,21 +546,21 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         List<SubTask> resultList = taskManager.getAllSubTasksOfOneEpic(0);
 
-        Assertions.assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
-        Assertions.assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
-        Assertions.assertEquals(Status.NEW, resultList.get(0).getStatus());
-        Assertions.assertEquals(1, resultList.get(0).getId());
-        Assertions.assertEquals(0, resultList.get(0).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу сабтаска", resultList.get(1).getName());
-        Assertions.assertEquals("Написать тест к методу createSubTask", resultList.get(1).getDescription());
-        Assertions.assertEquals(Status.IN_PROGRESS, resultList.get(1).getStatus());
-        Assertions.assertEquals(2, resultList.get(1).getId());
-        Assertions.assertEquals(0, resultList.get(1).getEpicId());
-        Assertions.assertEquals("Придумать тест к методу эпика", resultList.get(2).getName());
-        Assertions.assertEquals("Написать тест к методу createEpic", resultList.get(2).getDescription());
-        Assertions.assertEquals(Status.DONE, resultList.get(2).getStatus());
-        Assertions.assertEquals(3, resultList.get(2).getId());
-        Assertions.assertEquals(0, resultList.get(2).getEpicId());
+        assertEquals("Придумать тест к методам таска", resultList.get(0).getName());
+        assertEquals("Написать тест к методу createTask", resultList.get(0).getDescription());
+        assertEquals(Status.NEW, resultList.get(0).getStatus());
+        assertEquals(1, resultList.get(0).getId());
+        assertEquals(0, resultList.get(0).getEpicId());
+        assertEquals("Придумать тест к методу сабтаска", resultList.get(1).getName());
+        assertEquals("Написать тест к методу createSubTask", resultList.get(1).getDescription());
+        assertEquals(Status.IN_PROGRESS, resultList.get(1).getStatus());
+        assertEquals(2, resultList.get(1).getId());
+        assertEquals(0, resultList.get(1).getEpicId());
+        assertEquals("Придумать тест к методу эпика", resultList.get(2).getName());
+        assertEquals("Написать тест к методу createEpic", resultList.get(2).getDescription());
+        assertEquals(Status.DONE, resultList.get(2).getStatus());
+        assertEquals(3, resultList.get(2).getId());
+        assertEquals(0, resultList.get(2).getEpicId());
     }
 
     @Test
@@ -596,19 +607,95 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(10, historyList.get(0).getId());
-        Assertions.assertEquals(11, historyList.get(1).getId());
-        Assertions.assertEquals(12, historyList.get(2).getId());
-        Assertions.assertEquals(0, historyList.get(3).getId());
-        Assertions.assertEquals(1, historyList.get(4).getId());
-        Assertions.assertEquals(2, historyList.get(5).getId());
-        Assertions.assertEquals(3, historyList.get(6).getId());
-        Assertions.assertEquals(4, historyList.get(7).getId());
-        Assertions.assertEquals(5, historyList.get(8).getId());
-        Assertions.assertEquals(6, historyList.get(9).getId());
-        Assertions.assertEquals(7, historyList.get(10).getId());
-        Assertions.assertEquals(8, historyList.get(11).getId());
-        Assertions.assertEquals(9, historyList.get(12).getId());
+        assertEquals(10, historyList.get(0).getId());
+        assertEquals(11, historyList.get(1).getId());
+        assertEquals(12, historyList.get(2).getId());
+        assertEquals(0, historyList.get(3).getId());
+        assertEquals(1, historyList.get(4).getId());
+        assertEquals(2, historyList.get(5).getId());
+        assertEquals(3, historyList.get(6).getId());
+        assertEquals(4, historyList.get(7).getId());
+        assertEquals(5, historyList.get(8).getId());
+        assertEquals(6, historyList.get(9).getId());
+        assertEquals(7, historyList.get(10).getId());
+        assertEquals(8, historyList.get(11).getId());
+        assertEquals(9, historyList.get(12).getId());
+    }
+
+    @Test
+    void epicStatusShouldBeEqualNew() {
+        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.NEW, 0);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW, 0);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.NEW, 0);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.NEW, 0);
+        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.NEW, 0);
+
+        taskManager.createEpic(epic0);
+        taskManager.createSubTask(subTask0);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        taskManager.createSubTask(subTask4);
+
+        assertEquals(Status.NEW, taskManager.getEpicById(0).getStatus());
+    }
+
+    @Test
+    void epicStatusShouldBeEqualDone() {
+        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.DONE, 0);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.DONE, 0);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.DONE, 0);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.DONE, 0);
+        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.DONE, 0);
+
+        taskManager.createEpic(epic0);
+        taskManager.createSubTask(subTask0);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        taskManager.createSubTask(subTask4);
+
+        assertEquals(Status.DONE, taskManager.getEpicById(0).getStatus());
+    }
+
+    @Test
+    void epicStatusShouldBeEqualInProgress() {
+        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.DONE, 0);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.DONE, 0);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.DONE, 0);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.NEW, 0);
+        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.NEW, 0);
+
+        taskManager.createEpic(epic0);
+        taskManager.createSubTask(subTask0);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        taskManager.createSubTask(subTask4);
+
+        assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(0).getStatus());
+    }
+
+    @Test
+    void epicStatusShouldBeEqualInProgressAllSubtasksAreInProgress() {
+        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.IN_PROGRESS, 0);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.IN_PROGRESS, 0);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.IN_PROGRESS, 0);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.IN_PROGRESS, 0);
+        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.IN_PROGRESS, 0);
+
+        taskManager.createEpic(epic0);
+        taskManager.createSubTask(subTask0);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        taskManager.createSubTask(subTask3);
+        taskManager.createSubTask(subTask4);
+
+        assertEquals(Status.IN_PROGRESS, taskManager.getEpicById(0).getStatus());
     }
 
     //New Tests For InMemoryHistoryManager to check
@@ -664,16 +751,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteAllTasks();
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(5, historyList.get(0).getId());
-        Assertions.assertEquals(6, historyList.get(1).getId());
-        Assertions.assertEquals(7, historyList.get(2).getId());
-        Assertions.assertEquals(8, historyList.get(3).getId());
-        Assertions.assertEquals(9, historyList.get(4).getId());
-        Assertions.assertEquals(10, historyList.get(5).getId());
-        Assertions.assertEquals(11, historyList.get(6).getId());
-        Assertions.assertEquals(12, historyList.get(7).getId());
-        Assertions.assertEquals(13, historyList.get(8).getId());
-        Assertions.assertEquals(14, historyList.get(9).getId());
+        assertEquals(5, historyList.get(0).getId());
+        assertEquals(6, historyList.get(1).getId());
+        assertEquals(7, historyList.get(2).getId());
+        assertEquals(8, historyList.get(3).getId());
+        assertEquals(9, historyList.get(4).getId());
+        assertEquals(10, historyList.get(5).getId());
+        assertEquals(11, historyList.get(6).getId());
+        assertEquals(12, historyList.get(7).getId());
+        assertEquals(13, historyList.get(8).getId());
+        assertEquals(14, historyList.get(9).getId());
     }
 
     @Test
@@ -727,16 +814,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteAllSubTasks();
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(0, historyList.get(0).getId());
-        Assertions.assertEquals(1, historyList.get(1).getId());
-        Assertions.assertEquals(2, historyList.get(2).getId());
-        Assertions.assertEquals(3, historyList.get(3).getId());
-        Assertions.assertEquals(4, historyList.get(4).getId());
-        Assertions.assertEquals(5, historyList.get(5).getId());
-        Assertions.assertEquals(6, historyList.get(6).getId());
-        Assertions.assertEquals(7, historyList.get(7).getId());
-        Assertions.assertEquals(8, historyList.get(8).getId());
-        Assertions.assertEquals(9, historyList.get(9).getId());
+        assertEquals(0, historyList.get(0).getId());
+        assertEquals(1, historyList.get(1).getId());
+        assertEquals(2, historyList.get(2).getId());
+        assertEquals(3, historyList.get(3).getId());
+        assertEquals(4, historyList.get(4).getId());
+        assertEquals(5, historyList.get(5).getId());
+        assertEquals(6, historyList.get(6).getId());
+        assertEquals(7, historyList.get(7).getId());
+        assertEquals(8, historyList.get(8).getId());
+        assertEquals(9, historyList.get(9).getId());
     }
 
     @Test
@@ -790,11 +877,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteAllEpics();
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(0, historyList.get(0).getId());
-        Assertions.assertEquals(1, historyList.get(1).getId());
-        Assertions.assertEquals(2, historyList.get(2).getId());
-        Assertions.assertEquals(3, historyList.get(3).getId());
-        Assertions.assertEquals(4, historyList.get(4).getId());
+        assertEquals(0, historyList.get(0).getId());
+        assertEquals(1, historyList.get(1).getId());
+        assertEquals(2, historyList.get(2).getId());
+        assertEquals(3, historyList.get(3).getId());
+        assertEquals(4, historyList.get(4).getId());
     }
 
     @Test
@@ -846,12 +933,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteTaskById(9);
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(2, historyList.get(0).getId());
-        Assertions.assertEquals(3, historyList.get(1).getId());
-        Assertions.assertEquals(4, historyList.get(2).getId());
-        Assertions.assertEquals(5, historyList.get(3).getId());
-        Assertions.assertEquals(6, historyList.get(4).getId());
-        Assertions.assertEquals(8, historyList.get(5).getId());
+        assertEquals(2, historyList.get(0).getId());
+        assertEquals(3, historyList.get(1).getId());
+        assertEquals(4, historyList.get(2).getId());
+        assertEquals(5, historyList.get(3).getId());
+        assertEquals(6, historyList.get(4).getId());
+        assertEquals(8, historyList.get(5).getId());
 
     }
 
@@ -883,9 +970,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteEpicById(1);
         List<Task> historyList = taskManager.getHistory();
 
-        Assertions.assertEquals(0, historyList.get(0).getId());
-        Assertions.assertEquals(2, historyList.get(1).getId());
-        Assertions.assertEquals(5, historyList.get(2).getId());
+        assertEquals(0, historyList.get(0).getId());
+        assertEquals(2, historyList.get(1).getId());
+        assertEquals(5, historyList.get(2).getId());
     }
 
     @Test
@@ -903,11 +990,44 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertFalse(taskManager.getTaskById(0).getName().equals(taskFromHistory.getName()));
         Assertions.assertFalse(taskManager.getTaskById(0).getDescription().equals(taskFromHistory.getDescription()));
         Assertions.assertFalse(taskManager.getTaskById(0).getStatus() == taskFromHistory.getStatus());
-        Assertions.assertEquals("Заголовок первого таска", taskFromHistory.getName());
-        Assertions.assertEquals("Описание первого таска", taskFromHistory.getDescription());
-        Assertions.assertEquals(Status.NEW, taskFromHistory.getStatus());
-        Assertions.assertEquals(0, taskFromHistory.getId());
+        assertEquals("Заголовок первого таска", taskFromHistory.getName());
+        assertEquals("Описание первого таска", taskFromHistory.getDescription());
+        assertEquals(Status.NEW, taskFromHistory.getStatus());
+        assertEquals(0, taskFromHistory.getId());
 
+    }
+
+    @Test
+    void historyShouldBeEmpty() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW);
+        taskManager.createTask(task5);
+        Task task6 = new Task("Заголовок седьмого таска", "Описание седьмого таска", Status.NEW);
+        taskManager.createTask(task6);
+        Task task7 = new Task("Заголовок восьмого таска", "Описание восьмого таска", Status.NEW);
+        taskManager.createTask(task7);
+        Task task8 = new Task("Заголовок девятого таска", "Описание девятого таска", Status.NEW);
+        taskManager.createTask(task8);
+        Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
+        taskManager.createTask(task9);
+        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
+        taskManager.createEpic(epic0);
+        Epic epic1 = new Epic("Заголовок второго эпика", "Описание второго эпика");
+        taskManager.createEpic(epic1);
+        Epic epic2 = new Epic("Заголовок третьего эпика", "Описание третьего эпика");
+
+        List<Task> historyList = taskManager.getHistory();
+
+        Assertions.assertTrue(historyList.isEmpty());
     }
 
     @Test
@@ -923,10 +1043,10 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         task0 = taskManager.getTaskById(0);
         Task taskFromHistory = taskManager.getHistory().get(0);
 
-        Assertions.assertTrue(task0.getName().equals(taskFromHistory.getName()));
-        Assertions.assertTrue(task0.getDescription().equals(taskFromHistory.getDescription()));
-        Assertions.assertTrue(task0.getStatus() == taskFromHistory.getStatus());
-        Assertions.assertTrue(task0.getId() == taskFromHistory.getId());
+        assertTrue(task0.getName().equals(taskFromHistory.getName()));
+        assertTrue(task0.getDescription().equals(taskFromHistory.getDescription()));
+        assertTrue(task0.getStatus() == taskFromHistory.getStatus());
+        assertTrue(task0.getId() == taskFromHistory.getId());
     }
 
     @Test
@@ -946,9 +1066,133 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteEpicById(0);
 
-        Assertions.assertTrue(taskManager.getHistory().equals(Collections.emptyList()));
+        assertTrue(taskManager.getHistory().equals(Collections.emptyList()));
 
     }
+
+    @Test
+    void firstTaskFromHistoryShouldBeRemoved() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW);
+        taskManager.createTask(task5);
+        Task task6 = new Task("Заголовок седьмого таска", "Описание седьмого таска", Status.NEW);
+        taskManager.createTask(task6);
+        Task task7 = new Task("Заголовок восьмого таска", "Описание восьмого таска", Status.NEW);
+        taskManager.createTask(task7);
+        Task task8 = new Task("Заголовок девятого таска", "Описание девятого таска", Status.NEW);
+        taskManager.createTask(task8);
+        Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
+        taskManager.createTask(task9);
+        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task1, task2, task3, task4, task5, task6, task7, task8, task9));
+
+        taskManager.getTaskById(0);
+        taskManager.getTaskById(1);
+        taskManager.getTaskById(2);
+        taskManager.getTaskById(3);
+        taskManager.getTaskById(4);
+        taskManager.getTaskById(5);
+        taskManager.getTaskById(6);
+        taskManager.getTaskById(7);
+        taskManager.getTaskById(8);
+        taskManager.getTaskById(9);
+
+        taskManager.deleteTaskById(0);
+        List<Task> historyList = taskManager.getHistory();
+
+        assertEquals(expectedList, historyList);
+    }
+
+    @Test
+    void fifthTaskFromHistoryShouldBeRemoved() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW);
+        taskManager.createTask(task5);
+        Task task6 = new Task("Заголовок седьмого таска", "Описание седьмого таска", Status.NEW);
+        taskManager.createTask(task6);
+        Task task7 = new Task("Заголовок восьмого таска", "Описание восьмого таска", Status.NEW);
+        taskManager.createTask(task7);
+        Task task8 = new Task("Заголовок девятого таска", "Описание девятого таска", Status.NEW);
+        taskManager.createTask(task8);
+        Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
+        taskManager.createTask(task9);
+        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task0, task1, task2, task3, task5, task6, task7, task8, task9));
+
+        taskManager.getTaskById(0);
+        taskManager.getTaskById(1);
+        taskManager.getTaskById(2);
+        taskManager.getTaskById(3);
+        taskManager.getTaskById(4);
+        taskManager.getTaskById(5);
+        taskManager.getTaskById(6);
+        taskManager.getTaskById(7);
+        taskManager.getTaskById(8);
+        taskManager.getTaskById(9);
+
+        taskManager.deleteTaskById(4);
+        List<Task> historyList = taskManager.getHistory();
+
+        assertEquals(expectedList, historyList);
+    }
+
+    @Test
+    void theLastTaskFromHistoryShouldBeRemoved() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW);
+        taskManager.createTask(task5);
+        Task task6 = new Task("Заголовок седьмого таска", "Описание седьмого таска", Status.NEW);
+        taskManager.createTask(task6);
+        Task task7 = new Task("Заголовок восьмого таска", "Описание восьмого таска", Status.NEW);
+        taskManager.createTask(task7);
+        Task task8 = new Task("Заголовок девятого таска", "Описание девятого таска", Status.NEW);
+        taskManager.createTask(task8);
+        Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
+        taskManager.createTask(task9);
+        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task0, task1, task2, task3, task4, task5, task6, task7, task8));
+
+        taskManager.getTaskById(0);
+        taskManager.getTaskById(1);
+        taskManager.getTaskById(2);
+        taskManager.getTaskById(3);
+        taskManager.getTaskById(4);
+        taskManager.getTaskById(5);
+        taskManager.getTaskById(6);
+        taskManager.getTaskById(7);
+        taskManager.getTaskById(8);
+        taskManager.getTaskById(9);
+
+        taskManager.deleteTaskById(9);
+        List<Task> historyList = taskManager.getHistory();
+
+        assertEquals(expectedList, historyList);
+    }
+
     @Test
     void afterSubTasksDeletingItsIdsAlsoShouldBeRemovedFromEpicsList() {
         Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
@@ -967,7 +1211,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteSubTaskById(2);
         taskManager.deleteSubTaskById(5);
 
-        Assertions.assertTrue(new ArrayList<>(Arrays.asList(1, 3, 4)).equals(epic0.getSubTasksIds()));
+        assertTrue(new ArrayList<>(Arrays.asList(1, 3, 4)).equals(epic0.getSubTasksIds()));
     }
 
     @Test
@@ -985,5 +1229,172 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Assertions.assertFalse(task0.getDescription() == taskFromManager.getDescription());
         Assertions.assertFalse(task0.getStatus() == taskFromManager.getStatus());
         Assertions.assertFalse(task0.getId() == taskFromManager.getId());
+    }
+
+    @Test
+    void shouldBeAnIntersectionOfTwoTasksInTheCompletionIntervals() {
+        long seconds0 = LocalDateTime.of(2025, 4, 2, 12, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime0 = Instant.ofEpochSecond(seconds0);
+        long seconds1 = LocalDateTime.of(2025, 4, 2, 12, 15, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime1 = Instant.ofEpochSecond(seconds1);
+        long seconds2 = LocalDateTime.of(2025, 4, 2, 12, 30, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime2 = Instant.ofEpochSecond(seconds2);
+        long seconds3 = LocalDateTime.of(2025, 4, 2, 12, 45, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime3 = Instant.ofEpochSecond(seconds3);
+        long seconds4 = LocalDateTime.of(2025, 4, 2, 13, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime4 = Instant.ofEpochSecond(seconds4);
+        long seconds5 = LocalDateTime.of(2025, 4, 2, 13, 7, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime5 = Instant.ofEpochSecond(seconds5);
+        Duration duration = Duration.ofMinutes(15);
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW, startTime0, duration);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1, duration);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW, startTime5, duration);
+        String errMessage = "Указанная задача: \"Заголовок шестого таска\" с \n"
+                + "датой начала: 13:07, 02.04.2025\n"
+                + "продолжительностью в минутах: 15\n"
+                + "пересекается с одной из уже добавленных раннее задач:\n"
+                + "\"Заголовок пятого таска\"\n"
+                + "дата начала: 13:00, 02.04.2025\n"
+                + "продолжительность в минутах: 15\n\n";
+
+        PrintStream originalOut = System.out;
+        try {
+            ByteArrayOutputStream outputCaptor = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(outputCaptor));
+
+            taskManager.createTask(task5);
+
+            String consoleOutput = outputCaptor.toString();
+            assertEquals(errMessage, consoleOutput);
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    void shouldBeTheTimeIntervalOfOneTaskIsInsideTheIntervalOfAnother() {
+        long seconds0 = LocalDateTime.of(2025, 4, 2, 12, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime0 = Instant.ofEpochSecond(seconds0);
+        long seconds1 = LocalDateTime.of(2025, 4, 2, 12, 7, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime1 = Instant.ofEpochSecond(seconds1);
+        long seconds2 = LocalDateTime.of(2025, 4, 2, 12, 30, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime2 = Instant.ofEpochSecond(seconds2);
+        long seconds3 = LocalDateTime.of(2025, 4, 2, 12, 45, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime3 = Instant.ofEpochSecond(seconds3);
+        long seconds4 = LocalDateTime.of(2025, 4, 2, 13, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime4 = Instant.ofEpochSecond(seconds4);
+        long seconds5 = LocalDateTime.of(2025, 4, 2, 13, 15, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime5 = Instant.ofEpochSecond(seconds5);
+        Duration duration = Duration.ofMinutes(15);
+        Duration durationOfTask1 = Duration.ofMinutes(2);
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW, startTime0, duration);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1, durationOfTask1);
+
+
+        String errMessage = "Указанная задача: \"Заголовок второго таска\" с \n"
+                + "датой начала: 12:07, 02.04.2025\n"
+                + "продолжительностью в минутах: 2\n"
+                + "пересекается с одной из уже добавленных раннее задач:\n"
+                + "\"Заголовок первого таска\"\n"
+                + "дата начала: 12:00, 02.04.2025\n"
+                + "продолжительность в минутах: 15\n\n";
+
+        PrintStream originalOut = System.out;
+        try {
+            ByteArrayOutputStream outputCaptor = new ByteArrayOutputStream();
+            System.setOut(new PrintStream(outputCaptor));
+
+            taskManager.createTask(task1);
+
+            String consoleOutput = outputCaptor.toString();
+            assertEquals(errMessage, consoleOutput);
+        } finally {
+            System.setOut(originalOut);
+        }
+    }
+
+    @Test
+    void shouldReturnSortedByTimeListOfTasks() {
+        long seconds0 = LocalDateTime.of(2026, 4, 2, 12, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime0 = Instant.ofEpochSecond(seconds0);
+        long seconds1 = LocalDateTime.of(2025, 4, 2, 12, 15, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime1 = Instant.ofEpochSecond(seconds1);
+        long seconds2 = LocalDateTime.of(2025, 5, 2, 12, 30, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime2 = Instant.ofEpochSecond(seconds2);
+        long seconds3 = LocalDateTime.of(2025, 4, 2, 12, 45, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime3 = Instant.ofEpochSecond(seconds3);
+        long seconds4 = LocalDateTime.of(2025, 4, 3, 13, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime4 = Instant.ofEpochSecond(seconds4);
+        long seconds5 = LocalDateTime.of(2025, 4, 2, 13, 45, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime5 = Instant.ofEpochSecond(seconds5);
+        Duration duration = Duration.ofMinutes(15);
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW, startTime0, duration);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1, duration);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW, startTime5, duration);
+        taskManager.createTask(task5);
+        ArrayList<Task> expectedListOfSortedByTimeTasks = new ArrayList<>();
+        expectedListOfSortedByTimeTasks.add(task1);
+        expectedListOfSortedByTimeTasks.add(task3);
+        expectedListOfSortedByTimeTasks.add(task5);
+        expectedListOfSortedByTimeTasks.add(task4);
+        expectedListOfSortedByTimeTasks.add(task2);
+        expectedListOfSortedByTimeTasks.add(task0);
+
+        ArrayList<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
+
+        Assertions.assertEquals(expectedListOfSortedByTimeTasks, listOfSortedByTimeTasks);
     }
 }
