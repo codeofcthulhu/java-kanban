@@ -1,10 +1,9 @@
 package manager;
 
-import java.util.ArrayList;
+import java.util.List;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
-import java.util.List;
 
 public interface TaskManager {
 
