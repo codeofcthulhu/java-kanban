@@ -2,11 +2,13 @@ package manager;
 
 import exceptions.ManagerFileInitializationException;
 import exceptions.ManagerSaveException;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -34,9 +36,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Map<Integer, SubTask> subTasks,
             int idCounter,
             HistoryManager historyManager,
+            SortedSet<Task> treeSetByTime,
             Path data
     ) {
-        super(tasks, epics, subTasks, idCounter, historyManager);
+        super(tasks, epics, subTasks, idCounter, historyManager, treeSetByTime);
         this.data = data;
     }
 
@@ -81,6 +84,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Map<Integer, Task> tasksMap = new HashMap<>();
         Map<Integer, Epic> epicsMap = new HashMap<>();
         Map<Integer, SubTask> subTasksMap = new HashMap<>();
+        SortedSet<Task> treeSetByTime = new TreeSet<>((Comparator.comparing(Task::getStartTime)));
         try {
             List<String> allLines = Files.readAllLines(file);
             if (allLines.isEmpty()) {
@@ -101,10 +105,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 subTasksMap.put(id, s);
                                 Epic epic = epicsMap.get(s.getEpicId());
                                 epic.addSubTaskById(id);
+                                if (timeIsSet(s)) {
+                                    treeSetByTime.add(s);
+                                }
                             }
                             case Task t -> {
                                 int id = t.getId();
                                 tasksMap.put(id, t);
+                                if (timeIsSet(t)) {
+                                    treeSetByTime.add(t);
+                                }
                             }
                         }
                     }
@@ -116,7 +126,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerFileInitializationException(errorMessage);
         }
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tasksMap, epicsMap, subTasksMap, lastId,
-                Managers.getDefaultHistory(), file);
+                Managers.getDefaultHistory(), treeSetByTime, file);
         return fileBackedTaskManager;
     }
 

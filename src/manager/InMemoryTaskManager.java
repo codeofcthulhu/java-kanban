@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 import tasks.Epic;
@@ -25,7 +26,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected Map<Integer, Task> tasks;
     protected Map<Integer, Epic> epics;
     protected Map<Integer, SubTask> subTasks;
-    protected TreeSet<Task> treeSetByTime = new TreeSet<>((Comparator.comparing(Task::getStartTime)));
+    protected SortedSet<Task> treeSetByTime;
     protected int idCounter;
     private HistoryManager historyManager;
 
@@ -35,15 +36,17 @@ public class InMemoryTaskManager implements TaskManager {
         subTasks = new HashMap<>();
         this.historyManager = historyManager;
         idCounter = 0;
+        treeSetByTime = new TreeSet<>((Comparator.comparing(Task::getStartTime)));
     }
 
     protected InMemoryTaskManager(Map<Integer, Task> tasks, Map<Integer, Epic> epics, Map<Integer, SubTask> subTasks,
-            int idCounter, HistoryManager historyManager) {
+            int idCounter, HistoryManager historyManager, SortedSet<Task> treeSetByTime) {
         this.tasks = tasks;
         this.epics = epics;
         this.subTasks = subTasks;
         this.idCounter = idCounter;
         this.historyManager = historyManager;
+        this.treeSetByTime = treeSetByTime;
     }
 
     private int generateNewId() {
@@ -104,7 +107,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTasks() {
-        tasks.values().stream().peek(task -> historyManager.remove(task.getId())).filter(this::timeIsSet)
+        tasks.values().stream().peek(task -> historyManager.remove(task.getId())).filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
 
         tasks.clear();
@@ -183,13 +186,13 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubTasks() {
-        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(this::timeIsSet)
+        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
         subTasks.clear();
         epics.values().stream().peek(epic -> {
             epic.deleteAllSubTasks();
             updateEpicStatus(epic);
-        }).filter(this::timeIsSet).forEach(this::updateEpicTime);
+        }).filter(InMemoryTaskManager::timeIsSet).forEach(this::updateEpicTime);
     }
 
     @Override
@@ -218,7 +221,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.remove(id);
         historyManager.remove(epic.getId());
         epic.getSubTasksIds().stream().peek(idOfSubTask -> historyManager.remove(idOfSubTask))
-                .map(idOfSubTask -> subTasks.remove(idOfSubTask)).filter(this::timeIsSet)
+                .map(idOfSubTask -> subTasks.remove(idOfSubTask)).filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
         return epic;
     }
@@ -243,7 +246,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         epics.keySet().stream().forEach(historyManager::remove);
-        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(this::timeIsSet)
+        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
         epics.clear();
         subTasks.clear();
@@ -261,7 +264,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getPrioritizedTasks() {
+    public List<Task> getPrioritizedTasks() {
         return new ArrayList<>(treeSetByTime);
     }
 
@@ -300,22 +303,12 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStartTime(null);
             epic.setDuration(null);
             epic.setEndTime(null);
-            return;
         } else {
-            class Result {
+            record EpicTime(Instant startTime, Instant endTime, Duration duration) {
 
-                private final Instant startTime;
-                private final Instant endTime;
-                private final Duration duration;
-
-                private Result(Instant startTime, Instant endTime, Duration duration) {
-                    this.startTime = startTime;
-                    this.endTime = endTime;
-                    this.duration = duration;
-                }
             }
 
-            Result result = subTasksIds.stream().map(id -> subTasks.get(id))
+            EpicTime epicTime = subTasksIds.stream().map(id -> subTasks.get(id))
                     .collect(Collectors.collectingAndThen(Collectors.toList(), list -> {
                         Instant startTime = list.stream().map(Task::getStartTime).filter(Objects::nonNull)
                                 .min(Instant::compareTo).orElse(null);
@@ -324,11 +317,11 @@ public class InMemoryTaskManager implements TaskManager {
                         Duration duration = list.stream().map(Task::getDuration).filter(Objects::nonNull)
                                 .reduce(Duration::plus).orElse(null);
 
-                        return new Result(startTime, endTime, duration);
+                        return new EpicTime(startTime, endTime, duration);
                     }));
-            epic.setStartTime(result.startTime);
-            epic.setDuration(result.duration);
-            epic.setEndTime(result.endTime);
+            epic.setStartTime(epicTime.startTime);
+            epic.setDuration(epicTime.duration);
+            epic.setEndTime(epicTime.endTime);
         }
     }
 
@@ -385,7 +378,7 @@ public class InMemoryTaskManager implements TaskManager {
         return (oneInsideOther || intersection);
     }
 
-    protected boolean timeIsSet(Task task) {
+    protected static boolean timeIsSet(Task task) {
         return (!((task.getStartTime() == null) && (task.getDuration() == null)));
     }
 }

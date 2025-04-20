@@ -1232,6 +1232,34 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    void shouldReturnEmptyListOfSortedByTimeTasks() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW);
+        taskManager.createTask(task2);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW);
+        taskManager.createTask(task3);
+        Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW);
+        taskManager.createTask(task4);
+        Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW);
+        taskManager.createTask(task5);
+        Task task6 = new Task("Заголовок седьмого таска", "Описание седьмого таска", Status.NEW);
+        taskManager.createTask(task6);
+        Task task7 = new Task("Заголовок восьмого таска", "Описание восьмого таска", Status.NEW);
+        taskManager.createTask(task7);
+        Task task8 = new Task("Заголовок девятого таска", "Описание девятого таска", Status.NEW);
+        taskManager.createTask(task8);
+        Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
+        taskManager.createTask(task9);
+
+        List<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
+
+        Assertions.assertTrue(listOfSortedByTimeTasks.isEmpty());
+    }
+
+    @Test
     void shouldBeAnIntersectionOfTwoTasksInTheCompletionIntervals() {
         long seconds0 = LocalDateTime.of(2025, 4, 2, 12, 0, 0)
                 .atZone(ZoneOffset.UTC)
@@ -1393,7 +1421,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         expectedListOfSortedByTimeTasks.add(task2);
         expectedListOfSortedByTimeTasks.add(task0);
 
-        ArrayList<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
+        List<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
 
         Assertions.assertEquals(expectedListOfSortedByTimeTasks, listOfSortedByTimeTasks);
     }
