@@ -1303,7 +1303,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 + "пересекается с одной из уже добавленных раннее задач:\n"
                 + "\"Заголовок пятого таска\"\n"
                 + "дата начала: 13:00, 02.04.2025\n"
-                + "продолжительность в минутах: 15\n\n";
+                + "продолжительность в минутах: 15\n"
+                + "Даннай задача не будет добавлена в менеджер задач.\n";
 
         PrintStream originalOut = System.out;
         try {
@@ -1358,7 +1359,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 + "пересекается с одной из уже добавленных раннее задач:\n"
                 + "\"Заголовок первого таска\"\n"
                 + "дата начала: 12:00, 02.04.2025\n"
-                + "продолжительность в минутах: 15\n\n";
+                + "продолжительность в минутах: 15\n"
+                + "Даннай задача не будет добавлена в менеджер задач.\n";
 
         PrintStream originalOut = System.out;
         try {
@@ -1424,5 +1426,34 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         List<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
 
         Assertions.assertEquals(expectedListOfSortedByTimeTasks, listOfSortedByTimeTasks);
+    }
+
+    @Test
+    void taskThatOverlapsInTimeWithPreviouslyAddedTasksWillNotBeAddedToTaskManager() {
+        long seconds0 = LocalDateTime.of(2026, 4, 2, 12, 0, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime0 = Instant.ofEpochSecond(seconds0);
+        long seconds1 = LocalDateTime.of(2025, 5, 2, 12, 18, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime1 = Instant.ofEpochSecond(seconds1);
+        long seconds2 = LocalDateTime.of(2025, 5, 2, 12, 30, 0)
+                .atZone(ZoneOffset.UTC)
+                .toEpochSecond();
+        Instant startTime2 = Instant.ofEpochSecond(seconds2);
+        Duration duration = Duration.ofMinutes(15);
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW, startTime0, duration);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1, duration);
+        taskManager.createTask(task1);
+        Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
+        List<Task> expectedListOfTasks = new ArrayList<>();
+        expectedListOfTasks.add(task0);
+        expectedListOfTasks.add(task1);
+
+        taskManager.createTask(task2);
+
+        Assertions.assertEquals(expectedListOfTasks, taskManager.getAllTasks());
     }
 }

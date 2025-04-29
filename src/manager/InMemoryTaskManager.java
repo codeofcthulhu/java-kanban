@@ -49,6 +49,10 @@ public class InMemoryTaskManager implements TaskManager {
         this.treeSetByTime = treeSetByTime;
     }
 
+    protected static boolean timeIsSet(Task task) {
+        return (!((task.getStartTime() == null) && (task.getDuration() == null)));
+    }
+
     private int generateNewId() {
         return idCounter++;
     }
@@ -59,7 +63,12 @@ public class InMemoryTaskManager implements TaskManager {
         task.setId(id);
         Task taskToAdd = new Task(task);
         if (timeIsSet(taskToAdd)) {
+            try {
             addToOrUpdateTreeSetByTime(taskToAdd);
+            } catch (TaskOverlapException exception) {
+                System.out.println(exception.getMessage());
+                return null;
+            }
         }
         tasks.put(id, taskToAdd);
         return task;
@@ -70,7 +79,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(task.getId())) {
             Task taskToAdd = new Task(task);
             if (timeIsSet(taskToAdd)) {
-                addToOrUpdateTreeSetByTime(taskToAdd);
+                try {
+                    addToOrUpdateTreeSetByTime(taskToAdd);
+                } catch (TaskOverlapException exception) {
+                    System.out.println(exception.getMessage());
+                    return null;
+                }
             }
             tasks.put(task.getId(), taskToAdd);
             return task;
@@ -104,7 +118,6 @@ public class InMemoryTaskManager implements TaskManager {
         return null;
     }
 
-
     @Override
     public void deleteAllTasks() {
         tasks.values().stream().peek(task -> historyManager.remove(task.getId())).filter(InMemoryTaskManager::timeIsSet)
@@ -124,7 +137,12 @@ public class InMemoryTaskManager implements TaskManager {
             epic.addSubTaskById(id);
             updateEpicStatus(epic);
             if (timeIsSet(subTaskToAdd)) {
-                addToOrUpdateTreeSetByTime(subTaskToAdd);
+                try {
+                    addToOrUpdateTreeSetByTime(subTaskToAdd);
+                } catch (TaskOverlapException exception) {
+                    System.out.println(exception.getMessage());
+                    return null;
+                }
                 updateEpicTime(epic);
             }
             return subTask;
@@ -141,7 +159,12 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epics.get(subTaskToAdd.getEpicId());
             updateEpicStatus(epic);
             if (timeIsSet(subTaskToAdd)) {
-                addToOrUpdateTreeSetByTime(subTaskToAdd);
+                try {
+                    addToOrUpdateTreeSetByTime(subTaskToAdd);
+                } catch (TaskOverlapException exception) {
+                    System.out.println(exception.getMessage());
+                    return null;
+                }
                 updateEpicTime(epic);
             }
             return subTask;
@@ -186,7 +209,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllSubTasks() {
-        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(InMemoryTaskManager::timeIsSet)
+        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId()))
+                .filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
         subTasks.clear();
         epics.values().stream().peek(epic -> {
@@ -246,7 +270,8 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteAllEpics() {
         epics.keySet().stream().forEach(historyManager::remove);
-        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId())).filter(InMemoryTaskManager::timeIsSet)
+        subTasks.values().stream().peek(subTask -> historyManager.remove(subTask.getId()))
+                .filter(InMemoryTaskManager::timeIsSet)
                 .forEach(this::deleteFromTreeSetByTime);
         epics.clear();
         subTasks.clear();
@@ -325,41 +350,42 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected void addToOrUpdateTreeSetByTime(Task task) {
-        try {
-            if (tasks.containsKey(task.getId())) {
-                deleteFromTreeSetByTime(tasks.get(task.getId()));
-            }
-            List<Task> tasksWithIntersection = getPrioritizedTasks().stream()
-                    .filter(taskFromTree -> hasIntersections(taskFromTree, task)).toList();
-            if (!tasksWithIntersection.isEmpty()) {
-                LocalDateTime taskDateTime = LocalDateTime.ofInstant(task.getStartTime(), ZoneOffset.UTC);
-                long taskDuration = task.getDuration().toMinutes();
-                StringBuilder message = new StringBuilder(String.format(
-                        "Указанная задача: \"%s\" с \n" + "датой начала: %s\n" + "продолжительностью в минутах: %d\n",
-                        task.getName(), taskDateTime.format(DATE_AND_TIME_FORMATTER), taskDuration));
-                if (tasksWithIntersection.size() == 1) {
-                    message.append("пересекается с одной из уже добавленных раннее задач:\n");
-                } else {
-                    message.append("пересекается с несколькими из уже добавленных раннее задач:\n");
-                }
-                for (Task taskWithIntersection : tasksWithIntersection) {
-                    LocalDateTime taskWithIntersectionDateTime = LocalDateTime.ofInstant(
-                            taskWithIntersection.getStartTime(), ZoneOffset.UTC);
-                    long taskWithIntersectionDuration = taskWithIntersection.getDuration().toMinutes();
-                    String taskWithIntersectionName = taskWithIntersection.getName();
-                    message.append(String.format("\"%s\"\n" + "дата начала: %s\n" + "продолжительность в минутах: %d\n",
-                            taskWithIntersectionName, taskWithIntersectionDateTime.format(DATE_AND_TIME_FORMATTER),
-                            taskWithIntersectionDuration));
-                }
-                throw new TaskOverlapException(message.toString());
-            } else {
-                treeSetByTime.add(task);
-            }
-        } catch (TaskOverlapException exception) {
-            System.out.println(exception.getMessage());
+    protected void addToOrUpdateTreeSetByTime(Task task) throws TaskOverlapException{
+        if (tasks.containsKey(task.getId())) {
+            deleteFromTreeSetByTime(tasks.get(task.getId()));
         }
+        List<Task> tasksWithIntersection = getPrioritizedTasks().stream()
+                .filter(taskFromTree -> hasIntersections(taskFromTree, task)).toList();
+        if (!tasksWithIntersection.isEmpty()) {
+            String message = buildTaskOverlapMessage(task, tasksWithIntersection);
+            throw new TaskOverlapException(message);
+        } else {
+            treeSetByTime.add(task);
+        }
+    }
 
+    private String buildTaskOverlapMessage(Task task, List<Task> tasksWithIntersection) {
+        LocalDateTime taskDateTime = LocalDateTime.ofInstant(task.getStartTime(), ZoneOffset.UTC);
+        long taskDuration = task.getDuration().toMinutes();
+        StringBuilder message = new StringBuilder(String.format(
+                "Указанная задача: \"%s\" с \n" + "датой начала: %s\n" + "продолжительностью в минутах: %d\n",
+                task.getName(), taskDateTime.format(DATE_AND_TIME_FORMATTER), taskDuration));
+        if (tasksWithIntersection.size() == 1) {
+            message.append("пересекается с одной из уже добавленных раннее задач:\n");
+        } else {
+            message.append("пересекается с несколькими из уже добавленных раннее задач:\n");
+        }
+        for (Task taskWithIntersection : tasksWithIntersection) {
+            LocalDateTime taskWithIntersectionDateTime = LocalDateTime.ofInstant(
+                    taskWithIntersection.getStartTime(), ZoneOffset.UTC);
+            long taskWithIntersectionDuration = taskWithIntersection.getDuration().toMinutes();
+            String taskWithIntersectionName = taskWithIntersection.getName();
+            message.append(String.format("\"%s\"\n" + "дата начала: %s\n" + "продолжительность в минутах: %d\n",
+                    taskWithIntersectionName, taskWithIntersectionDateTime.format(DATE_AND_TIME_FORMATTER),
+                    taskWithIntersectionDuration));
+        }
+        message.append("Даннай задача не будет добавлена в менеджер задач.");
+        return message.toString();
     }
 
     protected void deleteFromTreeSetByTime(Task task) {
@@ -376,9 +402,5 @@ public class InMemoryTaskManager implements TaskManager {
         boolean intersection = (endFirst > startSecond && endFirst < endSecond) || (startFirst > startSecond
                 && startFirst < endSecond);
         return (oneInsideOther || intersection);
-    }
-
-    protected static boolean timeIsSet(Task task) {
-        return (!((task.getStartTime() == null) && (task.getDuration() == null)));
     }
 }
