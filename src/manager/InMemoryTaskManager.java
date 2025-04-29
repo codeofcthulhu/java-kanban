@@ -350,7 +350,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    protected void addToOrUpdateTreeSetByTime(Task task) throws TaskOverlapException{
+    protected void addToOrUpdateTreeSetByTime(Task task) throws TaskOverlapException {
         if (tasks.containsKey(task.getId())) {
             deleteFromTreeSetByTime(tasks.get(task.getId()));
         }
