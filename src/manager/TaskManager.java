@@ -1,11 +1,12 @@
 package manager;
 
+import java.util.List;
 import tasks.Epic;
 import tasks.SubTask;
 import tasks.Task;
-import java.util.List;
 
 public interface TaskManager {
+
     Task createTask(Task task);
 
     Task updateTask(Task task);
@@ -45,4 +46,6 @@ public interface TaskManager {
     List<SubTask> getAllSubTasksOfOneEpic(int id);
 
     List<Task> getHistory();
+
+    List<Task> getPrioritizedTasks();
 }

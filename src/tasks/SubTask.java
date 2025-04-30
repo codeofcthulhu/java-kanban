@@ -2,6 +2,9 @@ package tasks;
 
 import manager.TasksTypes;
 
+import java.time.Duration;
+import java.time.Instant;
+
 public class SubTask extends Task {
     private int epicId;
 
@@ -11,9 +14,22 @@ public class SubTask extends Task {
     }
 
     public SubTask(SubTask subTask) {
-        super(subTask.getName(), subTask.getDescription(), subTask.getStatus());
+        super(subTask.getName(), subTask.getDescription(), subTask.getStatus(), subTask.getStartTime(), subTask.getDuration());
         this.setId(subTask.getId());
         epicId = subTask.getEpicId();
+    }
+
+
+    public SubTask(
+            String name,
+            String description,
+            Status status,
+            Instant startTime,
+            Duration duration,
+            int epicId
+    ) {
+        super(name, description, status, startTime, duration);
+        this.epicId = epicId;
     }
 
     public Integer getEpicId() {
@@ -26,6 +42,21 @@ public class SubTask extends Task {
 
     @Override
     public String toString() {
-        return String.format("%d,%s,%s,%s,%s,%d", getId(), TasksTypes.SUBTASK, getName(), getStatus(), getDescription(), getEpicId());
+        Long durationInMinutes;
+        if (getDuration() == null) {
+            durationInMinutes = null;
+        } else {
+            durationInMinutes = getDuration().toMinutes();
+        }
+        return String.format(
+                "%d,%s,%s,%s,%s,%s,,%d,%d",
+                getId(),
+                TasksTypes.SUBTASK,
+                getName(),
+                getStatus(),
+                getDescription(),
+                getStartTime(),
+                durationInMinutes,
+                getEpicId());
     }
 }

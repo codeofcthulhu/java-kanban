@@ -2,16 +2,20 @@ package manager;
 
 import exceptions.ManagerFileInitializationException;
 import exceptions.ManagerSaveException;
+import java.util.Comparator;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,15 +23,23 @@ import java.util.Map;
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private Path data;
-    private static final String DATA_HEAD = "id,type,name,status,description,epic\n";
+    private static final String DATA_HEAD = "id,type,name,status,description,startTime,endTime,duration,epic\n";
 
     public FileBackedTaskManager(HistoryManager historyManager, Path data) {
         super(historyManager);
         this.data = data;
     }
 
-    public FileBackedTaskManager(Map<Integer, Task> tasks, Map<Integer, Epic> epics, Map<Integer, SubTask> subTasks, int idCounter, HistoryManager historyManager, Path data) {
-        super(tasks, epics, subTasks, idCounter, historyManager);
+    public FileBackedTaskManager(
+            Map<Integer, Task> tasks,
+            Map<Integer, Epic> epics,
+            Map<Integer, SubTask> subTasks,
+            int idCounter,
+            HistoryManager historyManager,
+            SortedSet<Task> treeSetByTime,
+            Path data
+    ) {
+        super(tasks, epics, subTasks, idCounter, historyManager, treeSetByTime);
         this.data = data;
     }
 
@@ -72,6 +84,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Map<Integer, Task> tasksMap = new HashMap<>();
         Map<Integer, Epic> epicsMap = new HashMap<>();
         Map<Integer, SubTask> subTasksMap = new HashMap<>();
+        SortedSet<Task> treeSetByTime = new TreeSet<>((Comparator.comparing(Task::getStartTime)));
         try {
             List<String> allLines = Files.readAllLines(file);
             if (allLines.isEmpty()) {
@@ -92,10 +105,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 subTasksMap.put(id, s);
                                 Epic epic = epicsMap.get(s.getEpicId());
                                 epic.addSubTaskById(id);
+                                if (timeIsSet(s)) {
+                                    treeSetByTime.add(s);
+                                }
                             }
                             case Task t -> {
                                 int id = t.getId();
                                 tasksMap.put(id, t);
+                                if (timeIsSet(t)) {
+                                    treeSetByTime.add(t);
+                                }
                             }
                         }
                     }
@@ -107,7 +126,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerFileInitializationException(errorMessage);
         }
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(tasksMap, epicsMap, subTasksMap, lastId,
-                Managers.getDefaultHistory(), file);
+                Managers.getDefaultHistory(), treeSetByTime, file);
         return fileBackedTaskManager;
     }
 
@@ -122,7 +141,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         String taskName = words[2];
                         String taskDescription = words[4];
                         Status taskStatus = Status.valueOf(words[3]);
-                        Task task = new Task(taskName, taskDescription, taskStatus);
+                        Instant startTime;
+                        Duration duration;
+                        if ((!words[5].equals("null")) && (!words[6].equals("null"))) {
+                            startTime = Instant.parse(words[5]);
+                            duration = Duration.ofMinutes(Integer.parseInt(words[7]));
+                        } else {
+                            startTime = null;
+                            duration = null;
+                        }
+                        Task task = new Task(taskName, taskDescription, taskStatus, startTime, duration);
                         int id = Integer.parseInt(words[0]);
                         task.setId(id);
                         yield task;
@@ -139,7 +167,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         String epicName = words[2];
                         Status epicStatus = Status.valueOf(words[3]);
                         String epicDescription = words[4];
-                        Task epic = new Epic(epicName, epicDescription, epicStatus);
+                        Instant epicStartTime;
+                        Instant epicEndTime;
+                        Duration epicDuration;
+                        if ((!words[5].equals("null")) && (!words[6].equals("null")) && (!words[7].equals("null"))) {
+                            epicStartTime = Instant.parse(words[5]);
+                            epicEndTime = Instant.parse(words[6]);
+                            epicDuration = Duration.ofMinutes(Integer.parseInt(words[7]));
+                        } else {
+                            epicStartTime = null;
+                            epicEndTime = null;
+                            epicDuration = null;
+                        }
+                        Task epic = new Epic(epicName, epicDescription, epicStatus, epicStartTime, epicEndTime, epicDuration);
                         int id = Integer.parseInt(words[0]);
                         epic.setId(id);
                         yield epic;
@@ -153,8 +193,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         String subTaskName = words[2];
                         String subTaskDescription = words[4];
                         Status subTaskStatus = Status.valueOf(words[3]);
-                        int subTaskEpicId = Integer.parseInt(words[5]);
-                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskEpicId);
+                        Instant subTaskStartTime;
+                        Duration subTaskDuration;
+                        if ((!words[5].equals("null")) && (!words[6].equals("null"))) {
+                            subTaskStartTime = Instant.parse(words[5]);
+                            subTaskDuration = Duration.ofMinutes(Integer.parseInt(words[7]));
+                        } else {
+                            subTaskStartTime = null;
+                            subTaskDuration = null;
+                        }
+                        int subTaskEpicId = Integer.parseInt(words[8]);
+                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskStartTime, subTaskDuration, subTaskEpicId);
                         int id = Integer.parseInt(words[0]);
                         subTask.setId(id);
                         yield subTask;
