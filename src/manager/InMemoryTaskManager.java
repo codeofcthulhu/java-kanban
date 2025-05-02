@@ -1,5 +1,7 @@
 package manager;
 
+import exceptions.InvalidTaskException;
+import exceptions.TaskNotFoundException;
 import exceptions.TaskOverlapException;
 import java.time.Duration;
 import java.time.Instant;
@@ -27,7 +29,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected Map<Integer, Epic> epics;
     protected Map<Integer, SubTask> subTasks;
     protected SortedSet<Task> treeSetByTime;
-    protected int idCounter;
+    protected Integer idCounter;
     private HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
@@ -58,38 +60,32 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task createTask(Task task) {
+    public Task createTask(Task task) throws TaskOverlapException, InvalidTaskException {
+        validateTask(task);
         int id = generateNewId();
         task.setId(id);
         Task taskToAdd = new Task(task);
         if (timeIsSet(taskToAdd)) {
-            try {
             addToOrUpdateTreeSetByTime(taskToAdd);
-            } catch (TaskOverlapException exception) {
-                System.out.println(exception.getMessage());
-                return null;
-            }
         }
         tasks.put(id, taskToAdd);
         return task;
     }
 
     @Override
-    public Task updateTask(Task task) {
+    public Task updateTask(Task task) throws TaskOverlapException, InvalidTaskException {
+        validateTask(task);
         if (tasks.containsKey(task.getId())) {
             Task taskToAdd = new Task(task);
             if (timeIsSet(taskToAdd)) {
-                try {
-                    addToOrUpdateTreeSetByTime(taskToAdd);
-                } catch (TaskOverlapException exception) {
-                    System.out.println(exception.getMessage());
-                    return null;
-                }
+                addToOrUpdateTreeSetByTime(taskToAdd);
             }
             tasks.put(task.getId(), taskToAdd);
             return task;
+        } else {
+            String message = String.format("Задача с ID %d не найдена", task.getId());
+            throw new TaskNotFoundException(message);
         }
-        return null;
     }
 
     @Override
@@ -107,15 +103,16 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTaskById(Integer id) {
+    public Task getTaskById(Integer id) throws TaskNotFoundException {
         Task task = tasks.get(id);
         if (task != null) {
             Task historyTask = new Task(task);
             historyManager.add(historyTask);
             Task taskToReturn = new Task(task);
             return taskToReturn;
+        } else {
+            throw new TaskNotFoundException(String.format("Задача с ID %d не найдена", id));
         }
-        return null;
     }
 
     @Override
@@ -127,7 +124,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask createSubTask(SubTask subTask) {
+    public SubTask createSubTask(SubTask subTask) throws InvalidTaskException, TaskOverlapException {
+        validateSubTask(subTask);
         if (epics.containsKey(subTask.getEpicId())) {
             int id = generateNewId();
             subTask.setId(id);
@@ -137,39 +135,31 @@ public class InMemoryTaskManager implements TaskManager {
             epic.addSubTaskById(id);
             updateEpicStatus(epic);
             if (timeIsSet(subTaskToAdd)) {
-                try {
-                    addToOrUpdateTreeSetByTime(subTaskToAdd);
-                } catch (TaskOverlapException exception) {
-                    System.out.println(exception.getMessage());
-                    return null;
-                }
+                addToOrUpdateTreeSetByTime(subTaskToAdd);
                 updateEpicTime(epic);
             }
             return subTask;
         } else {
-            return null;
+            throw new InvalidTaskException(String.format("Не найден эпик с ID %d", subTask.getEpicId()));
         }
     }
 
     @Override
-    public SubTask updateSubTask(SubTask subTask) {
+    public SubTask updateSubTask(SubTask subTask) throws InvalidTaskException, TaskOverlapException {
+        validateSubTask(subTask);
         if (subTasks.containsKey(subTask.getId())) {
             SubTask subTaskToAdd = new SubTask(subTask);
             subTasks.put(subTaskToAdd.getId(), subTaskToAdd);
             Epic epic = epics.get(subTaskToAdd.getEpicId());
             updateEpicStatus(epic);
             if (timeIsSet(subTaskToAdd)) {
-                try {
-                    addToOrUpdateTreeSetByTime(subTaskToAdd);
-                } catch (TaskOverlapException exception) {
-                    System.out.println(exception.getMessage());
-                    return null;
-                }
+                addToOrUpdateTreeSetByTime(subTaskToAdd);
                 updateEpicTime(epic);
             }
             return subTask;
+        } else {
+            throw new InvalidTaskException(String.format("Не найдена подзадача с ID %d", subTask.getId()));
         }
-        return null;
     }
 
     @Override
@@ -196,15 +186,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public SubTask getSubTaskById(Integer id) {
+    public SubTask getSubTaskById(Integer id) throws TaskNotFoundException {
         SubTask subTask = subTasks.get(id);
         if (subTask != null) {
             Task historyTask = new SubTask(subTask);
             historyManager.add(historyTask);
             SubTask subTaskToReturn = new SubTask(subTask);
             return subTaskToReturn;
+        } else {
+            String message = String.format("Подзадача с ID %d не найдена", id);
+            throw new TaskNotFoundException(message);
         }
-        return null;
     }
 
     @Override
@@ -220,7 +212,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic createEpic(Epic epic) {
+    public Epic createEpic(Epic epic) throws InvalidTaskException {
+        validateEpic(epic);
         int id = generateNewId();
         epic.setId(id);
         Epic epicToAdd = new Epic(epic);
@@ -229,14 +222,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic updateEpic(Epic epic) {
+    public Epic updateEpic(Epic epic) throws InvalidTaskException {
+        validateEpic(epic);
         if (epics.containsKey(epic.getId())) {
             Epic existingEpic = epics.get(epic.getId());
             existingEpic.setName(epic.getName());
             existingEpic.setDescription(epic.getDescription());
             return epic;
         } else {
-            return null;
+            throw new InvalidTaskException(String.format("Эпик с ID %d не найден", epic.getId()));
         }
     }
 
@@ -256,15 +250,16 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic getEpicById(Integer id) {
+    public Epic getEpicById(Integer id) throws TaskNotFoundException {
         Epic epic = epics.get(id);
         if (epic != null) {
             Epic historyTask = new Epic(epic);
             historyManager.add(historyTask);
             Epic epicToReturn = new Epic(epic);
             return epicToReturn;
+        } else {
+            throw new TaskNotFoundException(String.format("Эпик с ID %d не найден", id));
         }
-        return null;
     }
 
     @Override
@@ -278,9 +273,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public List<SubTask> getAllSubTasksOfOneEpic(int id) {
-        return epics.get(id).getSubTasksIds().stream().map(subTaskId -> subTasks.get(subTaskId))
-                .collect(Collectors.toCollection(ArrayList::new));
+    public List<SubTask> getAllSubTasksOfOneEpic(int id) throws TaskNotFoundException {
+        if (epics.containsKey(id)) {
+            return epics.get(id).getSubTasksIds().stream().map(subTaskId -> subTasks.get(subTaskId))
+                    .collect(Collectors.toCollection(ArrayList::new));
+        } else {
+            throw new TaskNotFoundException(String.format("Эпик с ID %d не найден", id));
+        }
     }
 
     @Override
@@ -384,7 +383,7 @@ public class InMemoryTaskManager implements TaskManager {
                     taskWithIntersectionName, taskWithIntersectionDateTime.format(DATE_AND_TIME_FORMATTER),
                     taskWithIntersectionDuration));
         }
-        message.append("Даннай задача не будет добавлена в менеджер задач.");
+        message.append("Данная задача не будет добавлена в менеджер задач.");
         return message.toString();
     }
 
@@ -402,5 +401,26 @@ public class InMemoryTaskManager implements TaskManager {
         boolean intersection = (endFirst > startSecond && endFirst < endSecond) || (startFirst > startSecond
                 && startFirst < endSecond);
         return (oneInsideOther || intersection);
+    }
+
+    protected void validateTask(Task task) throws InvalidTaskException {
+        if (!(Objects.nonNull(task.getName()) && Objects.nonNull(task.getDescription()) && Objects.nonNull(
+                task.getStatus()))) {
+            throw new InvalidTaskException("Передана задача/подзадача/эпик с незаполненными обязательными полями");
+        }
+    }
+
+    protected void validateSubTask(SubTask subTask) throws InvalidTaskException {
+        validateTask(subTask);
+        if (!Objects.nonNull(subTask.getEpicId())) {
+            throw new InvalidTaskException("Передана подзадача с незаполненным ID эпика");
+        }
+    }
+
+    protected void validateEpic(Epic epic) throws InvalidTaskException {
+        validateTask(epic);
+        if (!Objects.nonNull((epic.getSubTasksIds()))) {
+            throw new InvalidTaskException("Передан эпик без списка подзадач");
+        }
     }
 }

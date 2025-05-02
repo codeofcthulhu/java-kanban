@@ -4,13 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import exceptions.TaskNotFoundException;
 import exceptions.TaskOverlapException;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,12 +22,8 @@ import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public abstract class TaskManagerTest<T extends TaskManager> {
+
     protected T taskManager;
 
     protected abstract T createTaskManager();
@@ -120,7 +119,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void statusDescriptionAndNameShouldBeuUpdated() {
         Task task = new Task("Придумать много тестов", "Написать хотя бы один тест", Status.NEW);
         taskManager.createTask(task);
-        Task updatedTask = new Task("Придумать достаточно много тестов", "Написать хотя бы три теста", Status.IN_PROGRESS);
+        Task updatedTask = new Task("Придумать достаточно много тестов", "Написать хотя бы три теста",
+                Status.IN_PROGRESS);
         updatedTask.setId(task.getId());
 
         Task taskResult = taskManager.updateTask(updatedTask);
@@ -143,9 +143,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.deleteTaskById(0);
         taskManager.deleteTaskById(2);
 
-        Assertions.assertNull(taskManager.getTaskById(0));
+        assertThrows(TaskNotFoundException.class, () -> {
+            taskManager.getTaskById(0);
+        }, "Первый таск по id не найден, так как успешно удалён");
+        assertThrows(TaskNotFoundException.class, () -> {
+            taskManager.getTaskById(2);
+        }, "Третий тасктпо id не найден, так как успешно удалён");
         Assertions.assertNotNull(taskManager.getTaskById(1));
-        Assertions.assertNull(taskManager.getTaskById(2));
     }
 
     @Test
@@ -271,7 +275,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteSubTaskById(1);
 
-        Assertions.assertNull(taskManager.getTaskById(1));
+        assertThrows(TaskNotFoundException.class, () -> {
+            taskManager.getTaskById(1);
+        }, "Сабтаск по id не найден, так как успешно удалён");
         assertEquals(new ArrayList<>(), taskManager.getAllSubTasksOfOneEpic(0));
     }
 
@@ -444,7 +450,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
         taskManager.deleteEpicById(0);
 
-        Assertions.assertNull(taskManager.getEpicById(0));
+        assertThrows(TaskNotFoundException.class, () -> {
+                    taskManager.getEpicById(0);
+                },
+                "В связи с тем, что эпик с ID = 0 был удалён, вызов функции по ID несуществующего уже эпика выбросил "
+                        + "исключение");
     }
 
     @Test
@@ -540,6 +550,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createSubTask(subTask2);
         Epic epic1 = new Epic("Придумать много тестов для объектов пакета менеджера",
                 "Написать хотя бы один тест");
+        taskManager.createEpic(epic1);
         SubTask subTask = new SubTask("Придумать тест к методу InMemoryTaskManager",
                 "Написать тест к методу", Status.NEW, epic1.getId());
         taskManager.createSubTask(subTask);
@@ -682,10 +693,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     void epicStatusShouldBeEqualInProgressAllSubtasksAreInProgress() {
         Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
-        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.IN_PROGRESS, 0);
-        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.IN_PROGRESS, 0);
-        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.IN_PROGRESS, 0);
-        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.IN_PROGRESS, 0);
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.IN_PROGRESS,
+                0);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.IN_PROGRESS,
+                0);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.IN_PROGRESS,
+                0);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска",
+                Status.IN_PROGRESS, 0);
         SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.IN_PROGRESS, 0);
 
         taskManager.createEpic(epic0);
@@ -1053,11 +1068,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     void afterDeletingEpicItsSubTasksShouldBeDeletedTooFromHistrory() {
         Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
         taskManager.createEpic(epic0);
-        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.NEW, 2);
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.NEW, 0);
         taskManager.createSubTask(subTask0);
-        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW, 2);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW, 0);
         taskManager.createSubTask(subTask1);
-        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.NEW, 2);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.NEW, 0);
         taskManager.createSubTask(subTask2);
         taskManager.getSubTaskById(1);
         taskManager.getEpicById(0);
@@ -1092,7 +1107,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task8);
         Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
         taskManager.createTask(task9);
-        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task1, task2, task3, task4, task5, task6, task7, task8, task9));
+        ArrayList<Task> expectedList = new ArrayList<>(
+                Arrays.asList(task1, task2, task3, task4, task5, task6, task7, task8, task9));
 
         taskManager.getTaskById(0);
         taskManager.getTaskById(1);
@@ -1133,7 +1149,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task8);
         Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
         taskManager.createTask(task9);
-        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task0, task1, task2, task3, task5, task6, task7, task8, task9));
+        ArrayList<Task> expectedList = new ArrayList<>(
+                Arrays.asList(task0, task1, task2, task3, task5, task6, task7, task8, task9));
 
         taskManager.getTaskById(0);
         taskManager.getTaskById(1);
@@ -1174,7 +1191,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task8);
         Task task9 = new Task("Заголовок десятого таска", "Описание десятого таска", Status.NEW);
         taskManager.createTask(task9);
-        ArrayList<Task> expectedList = new ArrayList<>(Arrays.asList(task0, task1, task2, task3, task4, task5, task6, task7, task8));
+        ArrayList<Task> expectedList = new ArrayList<>(
+                Arrays.asList(task0, task1, task2, task3, task4, task5, task6, task7, task8));
 
         taskManager.getTaskById(0);
         taskManager.getTaskById(1);
@@ -1292,32 +1310,18 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task1);
         Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
         taskManager.createTask(task2);
-        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3,
+                duration);
         taskManager.createTask(task3);
         Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
         taskManager.createTask(task4);
         Task task5 = new Task("Заголовок шестого таска", "Описание шестого таска", Status.NEW, startTime5, duration);
-        String errMessage = "Указанная задача: \"Заголовок шестого таска\" с \n"
-                + "датой начала: 13:07, 02.04.2025\n"
-                + "продолжительностью в минутах: 15\n"
-                + "пересекается с одной из уже добавленных раннее задач:\n"
-                + "\"Заголовок пятого таска\"\n"
-                + "дата начала: 13:00, 02.04.2025\n"
-                + "продолжительность в минутах: 15\n"
-                + "Даннай задача не будет добавлена в менеджер задач.\n";
 
-        PrintStream originalOut = System.out;
-        try {
-            ByteArrayOutputStream outputCaptor = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(outputCaptor));
-
-            taskManager.createTask(task5);
-
-            String consoleOutput = outputCaptor.toString();
-            assertEquals(errMessage, consoleOutput);
-        } finally {
-            System.setOut(originalOut);
-        }
+        assertThrows(TaskOverlapException.class, () -> {
+                    taskManager.createTask(task5);
+                },
+                "Пересечение временного интервала выполнения одной задачи с временным интервалом выполнения другой "
+                        + "задачи вызвало исключение");
     }
 
     @Test
@@ -1350,30 +1354,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Duration durationOfTask1 = Duration.ofMinutes(2);
         Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW, startTime0, duration);
         taskManager.createTask(task0);
-        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1, durationOfTask1);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW, startTime1,
+                durationOfTask1);
 
-
-        String errMessage = "Указанная задача: \"Заголовок второго таска\" с \n"
-                + "датой начала: 12:07, 02.04.2025\n"
-                + "продолжительностью в минутах: 2\n"
-                + "пересекается с одной из уже добавленных раннее задач:\n"
-                + "\"Заголовок первого таска\"\n"
-                + "дата начала: 12:00, 02.04.2025\n"
-                + "продолжительность в минутах: 15\n"
-                + "Даннай задача не будет добавлена в менеджер задач.\n";
-
-        PrintStream originalOut = System.out;
-        try {
-            ByteArrayOutputStream outputCaptor = new ByteArrayOutputStream();
-            System.setOut(new PrintStream(outputCaptor));
-
-            taskManager.createTask(task1);
-
-            String consoleOutput = outputCaptor.toString();
-            assertEquals(errMessage, consoleOutput);
-        } finally {
-            System.setOut(originalOut);
-        }
+        assertThrows(TaskOverlapException.class, () -> {
+                    taskManager.createTask(task1);
+                },
+                "Наличие временного интервала выполнения одной задачи внутри временного интервала выполнения другой "
+                        + "задачи вызвало исключение");
     }
 
     @Test
@@ -1409,7 +1397,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         taskManager.createTask(task1);
         Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
         taskManager.createTask(task2);
-        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3,
+                duration);
         taskManager.createTask(task3);
         Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
         taskManager.createTask(task4);
@@ -1452,8 +1441,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         expectedListOfTasks.add(task0);
         expectedListOfTasks.add(task1);
 
-        taskManager.createTask(task2);
-
+        assertThrows(TaskOverlapException.class, () -> {
+                    taskManager.createTask(task2);
+                },
+                "Наличие временного интервала выполнения одной задачи внутри временного интервала выполнения другой "
+                        + "задачи вызвало исключение");
         Assertions.assertEquals(expectedListOfTasks, taskManager.getAllTasks());
     }
 }

@@ -1,23 +1,26 @@
 package manager;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import exceptions.InvalidTaskException;
+import exceptions.TaskOverlapException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Status;
 import tasks.SubTask;
 import tasks.Task;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
 class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
@@ -185,21 +188,27 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         taskManager.createTask(task1);
         Task task2 = new Task("Заголовок третьего таска", "Описание третьего таска", Status.NEW, startTime2, duration);
         taskManager.createTask(task2);
-        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3,
+                duration);
         taskManager.createTask(task3);
         Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
         taskManager.createTask(task4);
         Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
         taskManager.createEpic(epic0);
-        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.NEW, startTime5, duration, 5);
+        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.NEW,
+                startTime5, duration, 5);
         taskManager.createSubTask(subTask0);
-        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW, startTime6, duration, 5);
+        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW,
+                startTime6, duration, 5);
         taskManager.createSubTask(subTask1);
-        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.NEW, startTime7, duration, 5);
+        SubTask subTask2 = new SubTask("Заголовок третьего сабтаска", "Описание третьего сабтаска", Status.NEW,
+                startTime7, duration, 5);
         taskManager.createSubTask(subTask2);
-        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.NEW, startTime8, duration,5);
+        SubTask subTask3 = new SubTask("Заголовок четвёртого сабтаска", "Описание четвёртого сабтаска", Status.NEW,
+                startTime8, duration, 5);
         taskManager.createSubTask(subTask3);
-        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.NEW, startTime9, duration,5);
+        SubTask subTask4 = new SubTask("Заголовок пятого сабтаска", "Описание пятого сабтаска", Status.NEW, startTime9,
+                duration, 5);
         taskManager.createSubTask(subTask4);
         ArrayList<Task> expectedListOfSortedByTimeTasks = new ArrayList<>();
         expectedListOfSortedByTimeTasks.add(subTask4);
@@ -217,5 +226,23 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
         List<Task> listOfSortedByTimeTasks = taskManager.getPrioritizedTasks();
 
         Assertions.assertEquals(expectedListOfSortedByTimeTasks, listOfSortedByTimeTasks);
+    }
+
+    @Test
+    void shouldThrowInvalidTaskExceptionBecauseOfTaskWithNullAlsoThisTaskShouldNotBeSavedInFile() {
+        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
+        taskManager.createTask(task0);
+        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
+        taskManager.createTask(task1);
+        Task task2 = new Task(null, null, null);
+        List<Task> expectedList = new ArrayList<>(List.of(task0, task1));
+        assertThrows(InvalidTaskException.class, () -> {
+                    taskManager.createTask(task2);
+                },
+                "Пустые поля в переданном в менеджер таске вызывают исключение");
+
+        taskManager = FileBackedTaskManager.loadFromFile(tempFile);
+        List<Task> tasksFromFile = taskManager.getAllTasks();
+        Assertions.assertEquals(expectedList, tasksFromFile);
     }
 }
