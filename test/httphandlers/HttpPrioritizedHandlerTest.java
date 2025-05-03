@@ -82,6 +82,7 @@ public class HttpPrioritizedHandlerTest extends HttpHandlerTest {
                 "Некорректная приоритизированный список");
         assertEquals(expectedListOfPrioritizedTasks, prioritizedListFromServer,
                 "Некорректная приоритизированный список");
+        assertEquals(1, prioritizedListFromServer.size(), "Некорректный размер приотизированного списка");
     }
 
     @Test
@@ -110,6 +111,5 @@ public class HttpPrioritizedHandlerTest extends HttpHandlerTest {
         assertEquals(manager.getPrioritizedTasks(), prioritizedListFromServer,
                 "Некорректная приоритизированный список");
         assertEquals(Collections.emptyList(), prioritizedListFromServer, "Некорректная приоритизированный список");
-        assertEquals(1, prioritizedListFromServer.size(), "Некорректный размер приотизированного списка");
     }
 }
