@@ -18,6 +18,7 @@ import tasks.SubTask;
 import tasks.Task;
 
 public class HttpHistoryHandlerTest extends HttpHandlerTest {
+
     @Test
     void shouldReturnHistoryWithThreeTasksAndSubtasks() throws IOException, InterruptedException {
         Task task0 = new Task("Task 0 name", "Task 0 Description",
@@ -28,11 +29,11 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
                 Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5));
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createTask(task0);
         manager.createTask(task1);
@@ -69,11 +70,11 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
                 Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5));
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createTask(task0);
         manager.createTask(task1);
@@ -106,11 +107,11 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
                 Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5));
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(50)), Duration.ofMinutes(10), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(100)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(160)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createTask(task0);
         manager.createTask(task1);

@@ -3,7 +3,6 @@ package manager;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import exceptions.InvalidTaskException;
-import exceptions.TaskOverlapException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

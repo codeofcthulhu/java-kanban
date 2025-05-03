@@ -2,7 +2,6 @@ package httphandlers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import exceptions.ErrorResponse;
 import java.io.IOException;
@@ -26,11 +25,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldGetThreeSubTasks() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -68,11 +67,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldGetSubTaskById() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -92,11 +91,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotFoundCodeBecauseOfIncorrectId() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -117,11 +116,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotFoundCodeBecauseOfNegativeId() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -142,11 +141,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotFoundCodeBecauseOfIdIsNotNumber() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -167,11 +166,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotFoundCodeBecauseUrlIsInvalid() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -193,7 +192,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldAddSubTask() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         String subtaskJson = jsonMapper.toJson(subTask0);
         URI url = URI.create("http://localhost:8080/subtasks");
@@ -214,17 +213,17 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldUpdateSubTask() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
         SubTask newSubTask1 = new SubTask("New Subtask 1 name", "New Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         newSubTask1.setId(2);
         URI url = URI.create("http://localhost:8080/subtasks/");
         String taskJson = jsonMapper.toJson(newSubTask1);
@@ -243,11 +242,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotAcceptableBecauseOfTaskOverlapCreateSubTask() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(7)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(7)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
@@ -268,17 +267,17 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotAcceptableBecauseOfTaskOverlapUpdateSubTask() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);
         manager.createSubTask(subTask2);
         SubTask newSubTask1 = new SubTask("New Subtask 1 name", "New Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(2)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(2)), Duration.ofMinutes(5), 0);
         newSubTask1.setId(2);
         URI url = URI.create("http://localhost:8080/subtasks/");
         String taskJson = jsonMapper.toJson(newSubTask1);
@@ -297,11 +296,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldDeleteSubTask() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         subTask1 = manager.createSubTask(subTask1);
@@ -322,11 +321,11 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
     void shouldReturnNotFoundCodeBecauseUrlIsInvalidDeleteMethod() throws IOException, InterruptedException {
         Epic epic0 = new Epic("Epic 0 name", "Epic 0 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 0);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 0);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(16)), Duration.ofMinutes(5), 0);
         manager.createEpic(epic0);
         manager.createSubTask(subTask0);
         manager.createSubTask(subTask1);

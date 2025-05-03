@@ -162,11 +162,11 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         Epic epic1 = new Epic("Epic 1 name", "Epic 1 description");
         Epic epic2 = new Epic("Epic 2 name", "Epic 2 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 2);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
         manager.createEpic(epic0);
         manager.createEpic(epic1);
         manager.createEpic(epic2);
@@ -190,11 +190,11 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         Epic epic1 = new Epic("Epic 1 name", "Epic 1 description");
         Epic epic2 = new Epic("Epic 2 name", "Epic 2 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 2);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
         manager.createEpic(epic0);
         manager.createEpic(epic1);
         manager.createEpic(epic2);
@@ -218,11 +218,11 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         Epic epic1 = new Epic("Epic 1 name", "Epic 1 description");
         Epic epic2 = new Epic("Epic 2 name", "Epic 2 description");
         SubTask subTask0 = new SubTask("Subtask 0 name", "Subtask 0 Description",
-                Status.NEW,  Instant.now(), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now(), Duration.ofMinutes(5), 2);
         SubTask subTask1 = new SubTask("Subtask 1 name", "Subtask 1 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(10)), Duration.ofMinutes(5), 2);
         SubTask subTask2 = new SubTask("Subtask 2 name", "Subtask 2 Description",
-                Status.NEW,  Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
+                Status.NEW, Instant.now().plus(Duration.ofMinutes(15)), Duration.ofMinutes(5), 2);
         manager.createEpic(epic0);
         manager.createEpic(epic1);
         manager.createEpic(epic2);
@@ -298,7 +298,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        Epic epicFromResponse = jsonMapper.fromJson(response.body(), Epic .class);
+        Epic epicFromResponse = jsonMapper.fromJson(response.body(), Epic.class);
 
         assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(new ArrayList<>(List.of(epic0, epic2)), manager.getAllEpics(), "Эпики не обновились");
