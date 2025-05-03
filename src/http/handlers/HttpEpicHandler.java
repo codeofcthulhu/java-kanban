@@ -125,8 +125,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
                 if (id < 0) {
                     throw new TaskIdIsIncorrectException("ID не может быть отрицательным");
                 } else {
-                    Epic EpicById = manager.deleteEpicById(id);
-                    String json = jsonMapper.toJson(EpicById);
+                    Epic epicById = manager.deleteEpicById(id);
+                    String json = jsonMapper.toJson(epicById);
                     sendResponse(exchange, json, 200);
                 }
             } catch (NumberFormatException exception) {
