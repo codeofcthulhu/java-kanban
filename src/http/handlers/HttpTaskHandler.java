@@ -78,7 +78,8 @@ public class HttpTaskHandler extends BaseHttpHandler {
     protected void handlePost(HttpExchange exchange)
             throws IOException, TaskOverlapException, InvalidTaskException, EndpointNotFoundException {
         String path = exchange.getRequestURI().getPath();
-        if (path.equals("/tasks")) {
+        String[] pathParts = path.split("/");
+        if (pathParts.length == 2) {
             byte[] bodyBytes = exchange.getRequestBody().readAllBytes();
             String bodyString = new String(bodyBytes, StandardCharsets.UTF_8);
             Task task = jsonMapper.fromJson(bodyString, Task.class);

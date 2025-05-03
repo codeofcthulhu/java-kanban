@@ -2,6 +2,7 @@ package http.server;
 
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
+import http.handlers.BaseHttpHandler;
 import http.handlers.HttpEpicHandler;
 import http.handlers.HttpHistoryHandler;
 import http.handlers.HttpPrioritizedHandler;
@@ -16,6 +17,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Map;
 import manager.Managers;
 import manager.TaskManager;
 import tasks.Status;
@@ -43,7 +46,7 @@ public class HttpTaskServer {
         this.jsonMapper = jsonMapper;
     }
 
-    public void start() throws IOException{
+    public void start() throws IOException {
         InetSocketAddress address = new InetSocketAddress("localhost", 8080);
         httpServer = HttpServer.create(address, 0);
         httpServer.createContext("/tasks", new HttpTaskHandler(manager, jsonMapper));

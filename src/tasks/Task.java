@@ -86,8 +86,10 @@ public class Task {
     }
 
     public Instant getEndTime() {
-        Instant endTime = startTime.plus(duration);
-        return endTime;
+        if (Objects.nonNull(startTime) && Objects.nonNull(duration)) {
+            Instant endTime = startTime.plus(duration);
+            return endTime;
+        } else return null;
     }
 
     @Override

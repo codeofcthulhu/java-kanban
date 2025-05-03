@@ -51,7 +51,8 @@ public class HttpSubTaskHandler extends HttpTaskHandler {
     @Override
     protected void handleGet(HttpExchange exchange)
             throws IOException, TaskNotFoundException, TaskIdIsIncorrectException, EndpointNotFoundException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
         if (pathParts.length == 2) {
             List<SubTask> allSubTasks = manager.getAllSubTasks();
             String json = jsonMapper.toJson(allSubTasks);
@@ -70,7 +71,8 @@ public class HttpSubTaskHandler extends HttpTaskHandler {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
             }
         } else {
-            throw new EndpointNotFoundException("Эндпоинт не найден");
+            throw new EndpointNotFoundException(
+                    String.format("Эндпоинт %s %s не найден", exchange.getRequestMethod(), path));
         }
     }
 
@@ -78,7 +80,8 @@ public class HttpSubTaskHandler extends HttpTaskHandler {
     protected void handlePost(HttpExchange exchange)
             throws IOException, TaskOverlapException, InvalidTaskException, EndpointNotFoundException {
         String path = exchange.getRequestURI().getPath();
-        if (path.equals("/subtasks")) {
+        String[] pathParts = path.split("/");
+        if (pathParts.length == 2) {
             byte[] bodyBytes = exchange.getRequestBody().readAllBytes();
             String bodyString = new String(bodyBytes, StandardCharsets.UTF_8);
             SubTask subTask = jsonMapper.fromJson(bodyString, SubTask.class);
@@ -100,7 +103,8 @@ public class HttpSubTaskHandler extends HttpTaskHandler {
     @Override
     protected void handleDelete(HttpExchange exchange)
             throws IOException, TaskIdIsIncorrectException, EndpointNotFoundException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
         if (pathParts.length == 3) {
             try {
                 int id = Integer.parseInt(pathParts[2]);
@@ -115,7 +119,8 @@ public class HttpSubTaskHandler extends HttpTaskHandler {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
             }
         } else {
-            throw new EndpointNotFoundException("Эндпоинт не найден");
+            throw new EndpointNotFoundException(
+                    String.format("Эндпоинт %s %s не найден", exchange.getRequestMethod(), path));
         }
 
     }

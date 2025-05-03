@@ -149,13 +149,13 @@ public class InMemoryTaskManager implements TaskManager {
         validateSubTask(subTask);
         if (subTasks.containsKey(subTask.getId())) {
             SubTask subTaskToAdd = new SubTask(subTask);
-            subTasks.put(subTaskToAdd.getId(), subTaskToAdd);
             Epic epic = epics.get(subTaskToAdd.getEpicId());
-            updateEpicStatus(epic);
             if (timeIsSet(subTaskToAdd)) {
                 addToOrUpdateTreeSetByTime(subTaskToAdd);
                 updateEpicTime(epic);
             }
+            subTasks.put(subTaskToAdd.getId(), subTaskToAdd);
+            updateEpicStatus(epic);
             return subTask;
         } else {
             throw new InvalidTaskException(String.format("Не найдена подзадача с ID %d", subTask.getId()));
@@ -350,8 +350,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void addToOrUpdateTreeSetByTime(Task task) throws TaskOverlapException {
-        if (tasks.containsKey(task.getId())) {
-            deleteFromTreeSetByTime(tasks.get(task.getId()));
+        if (task instanceof SubTask) {
+            if (subTasks.containsKey(task.getId())) {
+                deleteFromTreeSetByTime(subTasks.get(task.getId()));
+            }
+        } else {
+            if (tasks.containsKey(task.getId())) {
+                deleteFromTreeSetByTime(tasks.get(task.getId()));
+            }
         }
         List<Task> tasksWithIntersection = getPrioritizedTasks().stream()
                 .filter(taskFromTree -> hasIntersections(taskFromTree, task)).toList();

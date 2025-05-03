@@ -53,7 +53,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
     @Override
     protected void handleGet(HttpExchange exchange)
             throws IOException, TaskNotFoundException, TaskIdIsIncorrectException, EndpointNotFoundException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
         if (pathParts.length == 2) {
             List<Epic> allEpics = manager.getAllEpics();
             String json = jsonMapper.toJson(allEpics);
@@ -71,23 +72,22 @@ public class HttpEpicHandler extends HttpTaskHandler {
             } catch (NumberFormatException exception) {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
             }
-        } else if ((pathParts.length == 4) && (pathParts[3].equals("subTasks"))) {
+        } else if ((pathParts.length == 4) && (pathParts[3].equals("subtasks"))) {
             try {
                 int id = Integer.parseInt(pathParts[2]);
                 if (id < 0) {
                     throw new TaskIdIsIncorrectException("ID не может быть отрицательным");
                 } else {
-                    Epic epicById = manager.getEpicById(id);
                     List<SubTask> allSubTasksOfEpic = manager.getAllSubTasksOfOneEpic(id);
-                    Map<Epic, List<SubTask>> mapForJson = Map.of(epicById, allSubTasksOfEpic);
-                    String json = jsonMapper.toJson(mapForJson);
+                    String json = jsonMapper.toJson(allSubTasksOfEpic);
                     sendResponse(exchange, json, 200);
                 }
             } catch (NumberFormatException exception) {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
             }
         } else {
-            throw new EndpointNotFoundException("Эндпоинт не найден");
+            throw new EndpointNotFoundException(
+                    String.format("Эндпоинт %s %s не найден", exchange.getRequestMethod(), path));
         }
     }
 
@@ -95,7 +95,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
     protected void handlePost(HttpExchange exchange)
             throws IOException, TaskOverlapException, InvalidTaskException, EndpointNotFoundException {
         String path = exchange.getRequestURI().getPath();
-        if (path.equals("/epics")) {
+        String[] pathParts = path.split("/");
+        if (pathParts.length == 2) {
             byte[] bodyBytes = exchange.getRequestBody().readAllBytes();
             String bodyString = new String(bodyBytes, StandardCharsets.UTF_8);
             Epic epic = jsonMapper.fromJson(bodyString, Epic.class);
@@ -117,7 +118,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
     @Override
     protected void handleDelete(HttpExchange exchange)
             throws IOException, TaskIdIsIncorrectException, EndpointNotFoundException {
-        String[] pathParts = exchange.getRequestURI().getPath().split("/");
+        String path = exchange.getRequestURI().getPath();
+        String[] pathParts = path.split("/");
         if (pathParts.length == 3) {
             try {
                 int id = Integer.parseInt(pathParts[2]);
@@ -132,7 +134,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
             }
         } else {
-            throw new EndpointNotFoundException("Эндпоинт не найден");
+            throw new EndpointNotFoundException(
+                    String.format("Эндпоинт %s %s не найден", exchange.getRequestMethod(), path));
         }
 
     }
