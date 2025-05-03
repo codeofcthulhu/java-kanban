@@ -3,14 +3,13 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import exceptions.EndpointNotFoundException;
-import exceptions.TaskIdIsIncorrectException;
 import exceptions.InvalidTaskException;
+import exceptions.TaskIdIsIncorrectException;
 import exceptions.TaskNotFoundException;
 import exceptions.TaskOverlapException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import manager.TaskManager;
 import tasks.Epic;
@@ -65,8 +64,8 @@ public class HttpEpicHandler extends HttpTaskHandler {
                 if (id < 0) {
                     throw new TaskIdIsIncorrectException("ID не может быть отрицательным");
                 } else {
-                    Epic EpicById = manager.getEpicById(id);
-                    String json = jsonMapper.toJson(EpicById);
+                    Epic epicById = manager.getEpicById(id);
+                    String json = jsonMapper.toJson(epicById);
                     sendResponse(exchange, json, 200);
                 }
             } catch (NumberFormatException exception) {

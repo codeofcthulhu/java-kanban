@@ -1,6 +1,7 @@
 package exceptions;
 
 public class ErrorResponse {
+
     private String errorMessage;
     private Integer errorCode;
     private String urlOfRequest;

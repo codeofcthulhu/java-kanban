@@ -1,12 +1,12 @@
 package tasks;
 
-import manager.TasksTypes;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import manager.TasksTypes;
 
 public class Task {
+
     private String name;
     private String description;
     private Status status;
@@ -89,12 +89,16 @@ public class Task {
         if (Objects.nonNull(startTime) && Objects.nonNull(duration)) {
             Instant endTime = startTime.plus(duration);
             return endTime;
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) return false;
+        if (o == null) {
+            return false;
+        }
         Task task = (Task) o;
         return id == task.id;
     }

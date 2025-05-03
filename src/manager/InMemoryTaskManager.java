@@ -30,7 +30,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected Map<Integer, SubTask> subTasks;
     protected SortedSet<Task> treeSetByTime;
     protected Integer idCounter;
-    private HistoryManager historyManager;
+    private final HistoryManager historyManager;
 
     public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();

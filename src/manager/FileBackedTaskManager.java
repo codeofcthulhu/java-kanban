@@ -2,13 +2,6 @@ package manager;
 
 import exceptions.ManagerFileInitializationException;
 import exceptions.ManagerSaveException;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import tasks.Epic;
-import tasks.Status;
-import tasks.SubTask;
-import tasks.Task;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,13 +9,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import tasks.Epic;
+import tasks.Status;
+import tasks.SubTask;
+import tasks.Task;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private Path data;
+    private final Path data;
     private static final String DATA_HEAD = "id,type,name,status,description,startTime,endTime,duration,epic\n";
 
     public FileBackedTaskManager(HistoryManager historyManager, Path data) {
@@ -58,7 +58,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 for (String line : allLines) {
                     Task task = fromString(line);
                     if (task != null) {
-                        if (lastId < task.getId()) lastId = task.getId();
+                        if (lastId < task.getId()) {
+                            lastId = task.getId();
+                        }
                         switch (task) {
                             case Epic e -> {
                                 int id = e.getId();
@@ -143,7 +145,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             epicEndTime = null;
                             epicDuration = null;
                         }
-                        Task epic = new Epic(epicName, epicDescription, epicStatus, epicStartTime, epicEndTime, epicDuration);
+                        Task epic = new Epic(epicName, epicDescription, epicStatus, epicStartTime, epicEndTime,
+                                epicDuration);
                         int id = Integer.parseInt(words[0]);
                         epic.setId(id);
                         yield epic;
@@ -167,7 +170,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             subTaskDuration = null;
                         }
                         int subTaskEpicId = Integer.parseInt(words[8]);
-                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskStartTime, subTaskDuration, subTaskEpicId);
+                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskStartTime,
+                                subTaskDuration, subTaskEpicId);
                         int id = Integer.parseInt(words[0]);
                         subTask.setId(id);
                         yield subTask;

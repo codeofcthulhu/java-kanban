@@ -1,8 +1,8 @@
 package http.server;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
-import http.handlers.BaseHttpHandler;
 import http.handlers.HttpEpicHandler;
 import http.handlers.HttpHistoryHandler;
 import http.handlers.HttpPrioritizedHandler;
@@ -12,13 +12,10 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import com.google.gson.Gson;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Map;
 import manager.Managers;
 import manager.TaskManager;
 import tasks.Status;
@@ -26,7 +23,7 @@ import tasks.Task;
 
 public class HttpTaskServer {
 
-    private TaskManager manager;
+    private final TaskManager manager;
     private Gson jsonMapper;
     private HttpServer httpServer;
 
@@ -82,7 +79,8 @@ public class HttpTaskServer {
                 .toEpochSecond();
         Instant startTime4 = Instant.ofEpochSecond(seconds4);
         Duration duration = Duration.ofMinutes(15);
-        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3, duration);
+        Task task3 = new Task("Заголовок четвёртого таска", "Описание четвёртого таска", Status.NEW, startTime3,
+                duration);
         manager.createTask(task3);
         Task task4 = new Task("Заголовок пятого таска", "Описание пятого таска", Status.NEW, startTime4, duration);
         manager.createTask(task4);
