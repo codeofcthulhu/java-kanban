@@ -3,6 +3,7 @@ package http.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
+import http.handlers.BaseHttpHandler;
 import http.handlers.HttpEpicHandler;
 import http.handlers.HttpHistoryHandler;
 import http.handlers.HttpPrioritizedHandler;
@@ -23,6 +24,8 @@ import tasks.Task;
 
 public class HttpTaskServer {
 
+    private static final String HOSTNAME = "localhost";
+    private static final int PORT = 8080;
     private final TaskManager manager;
     private Gson jsonMapper;
     private HttpServer httpServer;
@@ -44,13 +47,14 @@ public class HttpTaskServer {
     }
 
     public void start() throws IOException {
-        InetSocketAddress address = new InetSocketAddress("localhost", 8080);
+        InetSocketAddress address = new InetSocketAddress(HOSTNAME, PORT);
         httpServer = HttpServer.create(address, 0);
-        httpServer.createContext("/tasks", new HttpTaskHandler(manager, jsonMapper));
-        httpServer.createContext("/subtasks", new HttpSubTaskHandler(manager, jsonMapper));
-        httpServer.createContext("/epics", new HttpEpicHandler(manager, jsonMapper));
-        httpServer.createContext("/history", new HttpHistoryHandler(manager, jsonMapper));
-        httpServer.createContext("/prioritized", new HttpPrioritizedHandler(manager, jsonMapper));
+        BaseHttpHandler.setUpHandlers(jsonMapper, manager);
+        httpServer.createContext("/tasks", new HttpTaskHandler());
+        httpServer.createContext("/subtasks", new HttpSubTaskHandler());
+        httpServer.createContext("/epics", new HttpEpicHandler());
+        httpServer.createContext("/history", new HttpHistoryHandler());
+        httpServer.createContext("/prioritized", new HttpPrioritizedHandler());
         httpServer.start();
     }
 

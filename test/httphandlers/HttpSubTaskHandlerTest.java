@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import exceptions.ErrorResponse;
+import http.handlers.HttpStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -40,7 +41,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<SubTask> subTasksFromServer = jsonMapper.fromJson(response.body(), new SubTaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(subTasksFromServer, "Задачи не возвращаются");
         assertEquals(manager.getAllSubTasks(), subTasksFromServer, "Некорректное количество задач");
     }
@@ -58,7 +59,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<SubTask> subTasksFromServer = jsonMapper.fromJson(response.body(), new SubTaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(Collections.emptyList(), subTasksFromServer, "Вернулся не пустой список");
         assertEquals(manager.getAllSubTasks(), subTasksFromServer, "Некорректное количество задач на сервере");
     }
@@ -82,7 +83,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         SubTask subTaskFromServer = jsonMapper.fromJson(response.body(), SubTask.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(subTaskFromServer, "Задача не возвращаются");
         assertEquals(manager.getSubTaskById(2), subTaskFromServer, "Вернулась некорректная задача");
     }
@@ -106,7 +107,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Подзадача с ID 250 не найдена", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/subtasks/250", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -131,7 +132,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("ID не может быть отрицательным", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/subtasks/-666", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -156,7 +157,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Отправленное ID lol некорреткно", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/subtasks/lol", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -181,7 +182,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт GET /subtasks/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/subtasks/yandex/practicum", errorResponse.getUrlOfRequest(),
@@ -200,7 +201,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode());
 
         List<SubTask> subtasksFromManager = manager.getAllSubTasks();
 
@@ -233,7 +234,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         SubTask subTaskFromServer = jsonMapper.fromJson(response.body(), SubTask.class);
 
-        assertEquals(201, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(newSubTask1, manager.getSubTaskById(2), "Подзадача не обновилась");
         assertEquals(manager.getSubTaskById(2), subTaskFromServer, "Вернулась некорректная подзадача");
     }
@@ -258,7 +259,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(406, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("/subtasks/", errorResponse.getUrlOfRequest(),
                 "Вернулась некорректная ссылка запроса");
     }
@@ -287,7 +288,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(406, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("/subtasks/", errorResponse.getUrlOfRequest(),
                 "Вернулась некорректная ссылка запроса");
     }
@@ -312,7 +313,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         SubTask subTaskFromServer = jsonMapper.fromJson(response.body(), SubTask.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(new ArrayList<>(List.of(subTask0, subTask2)), manager.getAllSubTasks(), "Подзадачи не обновились");
         assertEquals(subTask1, subTaskFromServer, "Вернулась некорректная подзадача");
     }
@@ -336,7 +337,7 @@ public class HttpSubTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт DELETE /subtasks/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/subtasks/yandex/practicum", errorResponse.getUrlOfRequest(),

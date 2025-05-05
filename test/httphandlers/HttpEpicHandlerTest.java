@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import exceptions.ErrorResponse;
+import http.handlers.HttpStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -35,7 +36,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Epic> epicsFromServer = jsonMapper.fromJson(response.body(), new EpicListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(epicsFromServer, "Эпики не возвращаются");
         assertEquals(manager.getAllEpics(), epicsFromServer, "Некорректное количество эпиков");
     }
@@ -51,7 +52,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Epic> epicsFromServer = jsonMapper.fromJson(response.body(), new EpicListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(Collections.emptyList(), epicsFromServer, "Вернулся не пустой список");
         assertEquals(manager.getAllEpics(), epicsFromServer, "Некорректное количество задач на сервере");
     }
@@ -70,7 +71,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Epic epicFromServer = jsonMapper.fromJson(response.body(), Epic.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(epicFromServer, "Задача не возвращаются");
         assertEquals(manager.getEpicById(2), epicFromServer, "Вернулась некорректная задача");
     }
@@ -89,7 +90,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эпик с ID 250 не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/250", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -109,7 +110,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("ID не может быть отрицательным", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/-666", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -129,7 +130,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Отправленное ID lol некорреткно", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/lol", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -149,7 +150,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт GET /epics/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/yandex/practicum", errorResponse.getUrlOfRequest(),
@@ -179,7 +180,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<SubTask> subTasksFromServer = jsonMapper.fromJson(response.body(), new SubTaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(subTasksFromServer, "Подзадачи не возвращаются");
         assertEquals(manager.getAllSubTasksOfOneEpic(2), subTasksFromServer, "Некорректное количество подзадач");
     }
@@ -207,7 +208,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<SubTask> subTasksFromServer = jsonMapper.fromJson(response.body(), new SubTaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertTrue(subTasksFromServer.isEmpty(), "Вернулся не пустой список подзадач");
         assertEquals(manager.getAllSubTasksOfOneEpic(1), subTasksFromServer, "Некорректное количество подзадач");
     }
@@ -235,7 +236,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эпик с ID 3 не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/3/subtasks", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -256,7 +257,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Epic> EpicsFromServer = manager.getAllEpics();
 
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode());
         assertNotNull(EpicsFromServer, "Эпики не возвращаются");
         assertEquals(3, EpicsFromServer.size(), "Некорректное количество эпиков'");
         assertEquals("Epic 2 name", EpicsFromServer.get(2).getName(), "Некорректное имя добавленного эпика");
@@ -280,7 +281,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Epic epic = jsonMapper.fromJson(response.body(), Epic.class);
 
-        assertEquals(201, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(newEpic1, manager.getEpicById(1), "Эпик не обновился");
         assertEquals(manager.getEpicById(1), epic, "Вернулся некорректный эпик");
     }
@@ -300,7 +301,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Epic epicFromResponse = jsonMapper.fromJson(response.body(), Epic.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(new ArrayList<>(List.of(epic0, epic2)), manager.getAllEpics(), "Эпики не обновились");
         assertEquals(epic1, epicFromResponse, "Вернулся некорректный эпик");
     }
@@ -319,7 +320,7 @@ public class HttpEpicHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт DELETE /epics/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/epics/yandex/practicum", errorResponse.getUrlOfRequest(),

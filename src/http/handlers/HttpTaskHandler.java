@@ -1,6 +1,5 @@
 package http.handlers;
 
-import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import exceptions.EndpointNotFoundException;
 import exceptions.InvalidTaskException;
@@ -11,38 +10,35 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
-import manager.TaskManager;
 import tasks.Task;
 
 public class HttpTaskHandler extends BaseHttpHandler {
 
-    public HttpTaskHandler(TaskManager manager, Gson jsonMapper) {
-        super(manager, jsonMapper);
-    }
-
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        String method = exchange.getRequestMethod();
+        HttpMethod method = HttpMethod.fromString(exchange.getRequestMethod());
         try {
             switch (method) {
-                case "GET":
+                case GET:
                     handleGet(exchange);
                     break;
-                case "POST":
+                case POST:
                     handlePost(exchange);
                     break;
-                case "DELETE":
+                case DELETE:
                     handleDelete(exchange);
                     break;
                 default:
-                    sendError(exchange, String.format("Обработка метода %s не предусмотрена", method), 405);
+                    sendError(exchange,
+                            String.format("Обработка метода %s не предусмотрена", exchange.getRequestMethod()),
+                            HttpStatus.METHOD_NOT_ALLOWED.getCode());
             }
         } catch (TaskNotFoundException | TaskIdIsIncorrectException | EndpointNotFoundException exception) {
-            sendError(exchange, exception.getMessage(), 404);
+            sendError(exchange, exception.getMessage(), HttpStatus.NOT_FOUND.getCode());
         } catch (TaskOverlapException exception) {
-            sendError(exchange, exception.getMessage(), 406);
+            sendError(exchange, exception.getMessage(), HttpStatus.NOT_ACCEPTABLE.getCode());
         } catch (Exception exception) {
-            sendError(exchange, exception.getMessage(), 500);
+            sendError(exchange, exception.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.getCode());
         } finally {
             exchange.close();
         }
@@ -55,7 +51,7 @@ public class HttpTaskHandler extends BaseHttpHandler {
         if (pathParts.length == 2) {
             List<Task> allTasks = manager.getAllTasks();
             String json = jsonMapper.toJson(allTasks);
-            sendResponse(exchange, json, 200);
+            sendResponse(exchange, json, HttpStatus.OK.getCode());
         } else if (pathParts.length == 3) {
             try {
                 int id = Integer.parseInt(pathParts[2]);
@@ -64,7 +60,7 @@ public class HttpTaskHandler extends BaseHttpHandler {
                 } else {
                     Task taskById = manager.getTaskById(id);
                     String json = jsonMapper.toJson(taskById);
-                    sendResponse(exchange, json, 200);
+                    sendResponse(exchange, json, HttpStatus.OK.getCode());
                 }
             } catch (NumberFormatException exception) {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));
@@ -90,7 +86,7 @@ public class HttpTaskHandler extends BaseHttpHandler {
                 postTask = manager.updateTask(task);
             }
             String json = jsonMapper.toJson(postTask);
-            sendResponse(exchange, json, 201);
+            sendResponse(exchange, json, HttpStatus.CREATED.getCode());
         } else {
             throw new EndpointNotFoundException(
                     String.format("Эндпоинт %s %s не найден", exchange.getRequestMethod(), path));
@@ -110,7 +106,7 @@ public class HttpTaskHandler extends BaseHttpHandler {
                 } else {
                     Task taskById = manager.deleteTaskById(id);
                     String json = jsonMapper.toJson(taskById);
-                    sendResponse(exchange, json, 200);
+                    sendResponse(exchange, json, HttpStatus.OK.getCode());
                 }
             } catch (NumberFormatException exception) {
                 throw new TaskIdIsIncorrectException(String.format("Отправленное ID %s некорреткно", pathParts[2]));

@@ -3,6 +3,7 @@ package httphandlers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import http.handlers.HttpStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -54,7 +55,7 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Task> historyFromServer = jsonMapper.fromJson(response.body(), new TaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(historyFromServer, "История не возвращается");
         assertEquals(manager.getHistory(), historyFromServer, "Некорректная история");
         assertEquals(expectedHistory, historyFromServer, "Некорректная история");
@@ -90,7 +91,7 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Task> historyFromServer = jsonMapper.fromJson(response.body(), new TaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(historyFromServer, "История не возвращается");
         assertEquals(manager.getHistory(), historyFromServer, "Некорректная история");
         assertEquals(expectedHistory, historyFromServer, "Некорректная история");
@@ -131,7 +132,7 @@ public class HttpHistoryHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Task> historyFromServer = jsonMapper.fromJson(response.body(), new TaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(manager.getHistory(), historyFromServer, "Некорректная история");
         assertEquals(Collections.emptyList(), historyFromServer, "Некорректная история");
     }

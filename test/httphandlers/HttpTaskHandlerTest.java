@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import exceptions.ErrorResponse;
+import http.handlers.HttpStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -35,7 +36,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Task> tasksFromServer = jsonMapper.fromJson(response.body(), new TaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(tasksFromServer, "Задачи не возвращаются");
         assertEquals(manager.getAllTasks(), tasksFromServer, "Некорректное количество задач");
     }
@@ -48,7 +49,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         List<Task> tasksFromServer = jsonMapper.fromJson(response.body(), new TaskListTypeToken().getType());
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(manager.getAllTasks(), tasksFromServer, "Некорректное количество задач");
     }
 
@@ -69,7 +70,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Task taskFromServer = jsonMapper.fromJson(response.body(), Task.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertNotNull(taskFromServer, "Задача не вернулась");
         assertEquals(task1, taskFromServer, "Вернулась некорректная задача");
     }
@@ -91,7 +92,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Задача с ID 250 не найдена", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/tasks/250", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -114,7 +115,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("ID не может быть отрицательным", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/tasks/-2", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -137,7 +138,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Отправленное ID lol некорреткно", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/tasks/lol", errorResponse.getUrlOfRequest(), "Вернулась некорректная ссылка запроса");
@@ -160,7 +161,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт GET /tasks/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/tasks/yandex/practicum", errorResponse.getUrlOfRequest(),
@@ -177,7 +178,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(201, response.statusCode());
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode());
 
         List<Task> tasksFromManager = manager.getAllTasks();
 
@@ -208,7 +209,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Task taskFromServer = jsonMapper.fromJson(response.body(), Task.class);
 
-        assertEquals(201, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.CREATED.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(newTask1, manager.getTaskById(1), "Задача не обновилась");
         assertEquals(manager.getTaskById(1), taskFromServer, "Вернулась некорректная задача");
     }
@@ -231,7 +232,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(406, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("/tasks/", errorResponse.getUrlOfRequest(),
                 "Вернулась некорректная ссылка запроса");
     }
@@ -258,7 +259,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(406, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_ACCEPTABLE.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("/tasks/", errorResponse.getUrlOfRequest(),
                 "Вернулась некорректная ссылка запроса");
     }
@@ -281,7 +282,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         Task taskFromServer = jsonMapper.fromJson(response.body(), Task.class);
 
-        assertEquals(200, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.OK.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals(new ArrayList<>(List.of(task0, task2)), manager.getAllTasks(), "Задачи не обновились");
         assertEquals(task1, taskFromServer, "Вернулась некорректная задача");
     }
@@ -303,7 +304,7 @@ public class HttpTaskHandlerTest extends HttpHandlerTest {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         ErrorResponse errorResponse = jsonMapper.fromJson(response.body(), ErrorResponse.class);
 
-        assertEquals(404, response.statusCode(), "Вернулся некорректный код ответа сервера");
+        assertEquals(HttpStatus.NOT_FOUND.getCode(), response.statusCode(), "Вернулся некорректный код ответа сервера");
         assertEquals("Эндпоинт DELETE /tasks/yandex/practicum не найден", errorResponse.getErrorMessage(),
                 "Вернулось неккоректное сообщение об ошибке");
         assertEquals("/tasks/yandex/practicum", errorResponse.getUrlOfRequest(),

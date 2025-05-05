@@ -11,12 +11,12 @@ import manager.TaskManager;
 
 public abstract class BaseHttpHandler implements HttpHandler {
 
-    protected TaskManager manager;
-    protected Gson jsonMapper;
+    protected static TaskManager manager;
+    protected static Gson jsonMapper;
 
-    public BaseHttpHandler(TaskManager manager, Gson jsonMapper) {
-        this.manager = manager;
-        this.jsonMapper = jsonMapper;
+    public static void setUpHandlers(Gson jsonMapper, TaskManager manager) {
+        BaseHttpHandler.jsonMapper = jsonMapper;
+        BaseHttpHandler.manager = manager;
     }
 
     protected void sendResponse(HttpExchange exchange, String json, int code) throws IOException {
@@ -30,8 +30,7 @@ public abstract class BaseHttpHandler implements HttpHandler {
     }
 
     protected void sendError(HttpExchange exchange, String message, int code) throws IOException {
-        ErrorResponse errorResponse = new ErrorResponse(exchange.getRequestURI().getPath(), message, code
-        );
+        ErrorResponse errorResponse = new ErrorResponse(exchange.getRequestURI().getPath(), message, code);
         String json = jsonMapper.toJson(errorResponse);
         sendResponse(exchange, json, code);
     }
