@@ -1,12 +1,12 @@
 package tasks;
 
-import manager.TasksTypes;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import manager.TasksTypes;
 
 public class Epic extends Task {
+
     private ArrayList<Integer> subTasksIds;
     private Instant endTime;
 

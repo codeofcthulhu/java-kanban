@@ -2,13 +2,6 @@ package manager;
 
 import exceptions.ManagerFileInitializationException;
 import exceptions.ManagerSaveException;
-import java.util.Comparator;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import tasks.Epic;
-import tasks.Status;
-import tasks.SubTask;
-import tasks.Task;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,13 +9,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import tasks.Epic;
+import tasks.Status;
+import tasks.SubTask;
+import tasks.Task;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    private Path data;
+    private final Path data;
     private static final String DATA_HEAD = "id,type,name,status,description,startTime,endTime,duration,epic\n";
 
     public FileBackedTaskManager(HistoryManager historyManager, Path data) {
@@ -43,42 +43,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.data = data;
     }
 
-    public static void main(String[] args) throws IOException {
-        Path tempFile = Files.createTempFile("data", ".csv");
-        System.out.println("Временный файл создан: " + tempFile);
-        TaskManager taskManager = Managers.getFileBackedTaskManager(tempFile);
-
-        Task task0 = new Task("Заголовок первого таска", "Описание первого таска", Status.NEW);
-        Task task1 = new Task("Заголовок второго таска", "Описание второго таска", Status.NEW);
-        Epic epic0 = new Epic("Заголовок первого эпика", "Описание первого эпика");
-        Epic epic1 = new Epic("Заголовок второго эпика", "Описание второго эпика");
-        SubTask subTask0 = new SubTask("Заголовок первого сабтаска", "Описание первого сабтаска", Status.IN_PROGRESS, 2);
-        SubTask subTask1 = new SubTask("Заголовок второго сабтаска", "Описание второго сабтаска", Status.NEW, 3);
-        Task createdTask0 = taskManager.createTask(task0);
-        Task createdTask1 = taskManager.createTask(task1);
-        taskManager.createEpic(epic0);
-        taskManager.createEpic(epic1);
-        SubTask createdSubTask4 = taskManager.createSubTask(subTask1);
-        SubTask createdSubtask5 = taskManager.createSubTask(subTask0);
-        Epic createdEpic2 = taskManager.getEpicById(2);
-        Epic createdEpic3 = taskManager.getEpicById(3);
-        taskManager = FileBackedTaskManager.loadFromFile(tempFile);
-        Task taskFromFile0 = taskManager.getTaskById(0);
-        Task taskFromFile1 = taskManager.getTaskById(1);
-        Epic epicFromFile2 = taskManager.getEpicById(2);
-        Epic epicFromFile3 = taskManager.getEpicById(3);
-        SubTask subTaskFromFile4 = taskManager.getSubTaskById(4);
-        SubTask subTaskFromFile5 = taskManager.getSubTaskById(5);
-
-        System.out.println(createdTask0.toString().equals(taskFromFile0.toString()));
-        System.out.println(createdTask1.toString().equals(taskFromFile1.toString()));
-        System.out.println(createdEpic2.toString().equals(epicFromFile2.toString()));
-        System.out.println(createdEpic3.toString().equals(epicFromFile3.toString()));
-        System.out.println(createdSubTask4.toString().equals(subTaskFromFile4.toString()));
-        System.out.println(createdSubtask5.toString().equals(createdSubtask5.toString()));
-
-    }
-
     public static FileBackedTaskManager loadFromFile(Path file) {
         int lastId = 0;
         Map<Integer, Task> tasksMap = new HashMap<>();
@@ -94,7 +58,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 for (String line : allLines) {
                     Task task = fromString(line);
                     if (task != null) {
-                        if (lastId < task.getId()) lastId = task.getId();
+                        if (lastId < task.getId()) {
+                            lastId = task.getId();
+                        }
                         switch (task) {
                             case Epic e -> {
                                 int id = e.getId();
@@ -179,7 +145,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             epicEndTime = null;
                             epicDuration = null;
                         }
-                        Task epic = new Epic(epicName, epicDescription, epicStatus, epicStartTime, epicEndTime, epicDuration);
+                        Task epic = new Epic(epicName, epicDescription, epicStatus, epicStartTime, epicEndTime,
+                                epicDuration);
                         int id = Integer.parseInt(words[0]);
                         epic.setId(id);
                         yield epic;
@@ -203,7 +170,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             subTaskDuration = null;
                         }
                         int subTaskEpicId = Integer.parseInt(words[8]);
-                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskStartTime, subTaskDuration, subTaskEpicId);
+                        Task subTask = new SubTask(subTaskName, subTaskDescription, subTaskStatus, subTaskStartTime,
+                                subTaskDuration, subTaskEpicId);
                         int id = Integer.parseInt(words[0]);
                         subTask.setId(id);
                         yield subTask;

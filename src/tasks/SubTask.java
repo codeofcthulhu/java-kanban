@@ -1,11 +1,11 @@
 package tasks;
 
-import manager.TasksTypes;
-
 import java.time.Duration;
 import java.time.Instant;
+import manager.TasksTypes;
 
 public class SubTask extends Task {
+
     private int epicId;
 
     public SubTask(String name, String description, Status status, Integer epicId) {
@@ -14,7 +14,8 @@ public class SubTask extends Task {
     }
 
     public SubTask(SubTask subTask) {
-        super(subTask.getName(), subTask.getDescription(), subTask.getStatus(), subTask.getStartTime(), subTask.getDuration());
+        super(subTask.getName(), subTask.getDescription(), subTask.getStatus(), subTask.getStartTime(),
+                subTask.getDuration());
         this.setId(subTask.getId());
         epicId = subTask.getEpicId();
     }

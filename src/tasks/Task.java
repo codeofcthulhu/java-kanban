@@ -1,16 +1,16 @@
 package tasks;
 
-import manager.TasksTypes;
-
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import manager.TasksTypes;
 
 public class Task {
+
     private String name;
     private String description;
     private Status status;
-    private int id;
+    private Integer id;
     private Instant startTime;
     private Duration duration;
 
@@ -61,7 +61,7 @@ public class Task {
         this.status = status;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -86,13 +86,19 @@ public class Task {
     }
 
     public Instant getEndTime() {
-        Instant endTime = startTime.plus(duration);
-        return endTime;
+        if (Objects.nonNull(startTime) && Objects.nonNull(duration)) {
+            Instant endTime = startTime.plus(duration);
+            return endTime;
+        } else {
+            return null;
+        }
     }
 
     @Override
     public boolean equals(Object o) {
-        if (o == null) return false;
+        if (o == null) {
+            return false;
+        }
         Task task = (Task) o;
         return id == task.id;
     }
